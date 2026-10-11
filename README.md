@@ -1,6 +1,6 @@
 <p align="center"><img src="docs/logo.png" width="160" alt="Shelly logo: a coral snail whose shell is a terminal window"></p>
 
-# Shelly: a Windows 11-style launcher for PowerShell scripts
+# Shelly: a Win11 style launcher for PowerShell scripts
 
 <p align="center">
   <img alt="Version 1.0.11" src="https://img.shields.io/badge/version-1.0.11-ff7a5e">
