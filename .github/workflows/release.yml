@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Test
+        run: dotnet test tests/Shelly.Core.Tests -c Release
+
+      - name: Publish framework-dependent
+        run: dotnet publish src/Shelly -c Release -r win-x64 -o publish/fd
+
+      - name: Publish self-contained
+        run: dotnet publish src/Shelly -c Release -r win-x64 -p:SelfContained=true -o publish/sc
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $ver = "${{ github.ref_name }}".TrimStart("v")
+          $layout = @("Scripts", "assets\shelly.ico", "build\.keep", "docs\USER_GUIDE.md", "docs\USER_GUIDE_RU.md", "README.md", "CHANGELOG.md", "LICENSE")
+
+          function Pack($src, $name) {
+            $dir = "dist\$name\Shelly"
+            New-Item -ItemType Directory -Force -Path $dir | Out-Null
+            Copy-Item "$src\Shelly.exe" $dir
+            foreach ($p in $layout) {
+              $dest = Join-Path $dir $p
+              New-Item -ItemType Directory -Force -Path (Split-Path $dest) | Out-Null
+              if (Test-Path $p) { Copy-Item $p $dest -Recurse -Force }
+            }
+            Compress-Archive -Path "dist\$name\Shelly" -DestinationPath "dist\$name.zip" -Force
+          }
+
+          Pack "publish\fd" "shelly-$ver"
+          Pack "publish\sc" "shelly-$ver-selfcontained"
+
+          Get-ChildItem dist\*.zip | ForEach-Object {
+            "{0}  {1}" -f (Get-FileHash $_ -Algorithm SHA256).Hash.ToLower(), $_.Name
+          } | Set-Content dist\SHA256SUMS.txt -Encoding ascii
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+          generate_release_notes: true
