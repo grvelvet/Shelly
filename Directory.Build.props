@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <Version>1.0.11</Version>
+    <AssemblyVersion>1.0.11.0</AssemblyVersion>
+    <FileVersion>1.0.11.0</FileVersion>
+    <Product>Shelly</Product>
+    <Authors>nah and Vika</Authors>
+    <Company>nah and Vika</Company>
+    <Copyright>Copyright (c) 2026 nah and Vika</Copyright>
+    <!-- GitHub repository (owner/name) for the update check and the About links. Set it before publishing. -->
+    <ShellyGitHubRepo>grvelvet/shelly</ShellyGitHubRepo>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="ShellyGitHubRepo" Value="$(ShellyGitHubRepo)" />
+  </ItemGroup>
+</Project>

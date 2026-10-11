@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="PowerShell" extensions=".ps1;.psm1;.psd1" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <!-- Light theme colors; EditorWindow swaps them for the dark theme -->
+  <Color name="Comment" foreground="#008000" />
+  <Color name="String" foreground="#A31515" />
+  <Color name="Variable" foreground="#0451A5" />
+  <Color name="Keyword" foreground="#AF00DB" />
+  <Color name="Command" foreground="#795E26" />
+  <Color name="Parameter" foreground="#5A5A5A" />
+  <Color name="Number" foreground="#098658" />
+  <Color name="Type" foreground="#267F99" />
+  <Color name="Operator" foreground="#5A5A5A" />
+  <Color name="Requires" foreground="#0000FF" fontWeight="bold" />
+
+  <RuleSet ignoreCase="true">
+    <Span color="Requires">
+      <Begin>\#requires\b</Begin>
+    </Span>
+    <Span color="Comment" multiline="true">
+      <Begin>&lt;\#</Begin>
+      <End>\#&gt;</End>
+    </Span>
+    <Span color="Comment">
+      <Begin>\#</Begin>
+    </Span>
+    <Span color="String" multiline="true">
+      <Begin>@"\s*$</Begin>
+      <End>^"@</End>
+      <RuleSet>
+        <Span color="Variable">
+          <Begin>\$\(</Begin>
+          <End>\)</End>
+        </Span>
+        <Rule color="Variable">\$[\w:]+</Rule>
+      </RuleSet>
+    </Span>
+    <Span color="String" multiline="true">
+      <Begin>@'\s*$</Begin>
+      <End>^'@</End>
+    </Span>
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Rule color="String">`.</Rule>
+        <Span color="Variable">
+          <Begin>\$\(</Begin>
+          <End>\)</End>
+        </Span>
+        <Rule color="Variable">\$(\{[^}]*\}|[\w:?]+)</Rule>
+      </RuleSet>
+    </Span>
+    <Span color="String">
+      <Begin>'</Begin>
+      <End>'</End>
+    </Span>
+
+    <Keywords color="Keyword">
+      <Word>begin</Word><Word>break</Word><Word>catch</Word><Word>class</Word><Word>continue</Word><Word>data</Word>
+      <Word>do</Word><Word>dynamicparam</Word><Word>else</Word><Word>elseif</Word><Word>end</Word><Word>enum</Word>
+      <Word>exit</Word><Word>filter</Word><Word>finally</Word><Word>for</Word><Word>foreach</Word><Word>function</Word>
+      <Word>if</Word><Word>in</Word><Word>param</Word><Word>process</Word><Word>return</Word><Word>switch</Word>
+      <Word>throw</Word><Word>trap</Word><Word>try</Word><Word>until</Word><Word>using</Word><Word>while</Word>
+      <Word>workflow</Word><Word>parallel</Word><Word>sequence</Word><Word>hidden</Word><Word>static</Word>
+    </Keywords>
+
+    <Rule color="Variable">\$(\{[^}]*\}|[\w:?^$]+)</Rule>
+    <Rule color="Variable">@\w+</Rule>
+    <Rule color="Type">\[[\w.,\[\] `]+\]</Rule>
+    <Rule color="Operator">-(eq|ne|gt|ge|lt|le|like|notlike|match|notmatch|replace|contains|notcontains|in|notin|and|or|not|xor|band|bor|bxor|bnot|shl|shr|is|isnot|as|f|split|join|ceq|cne|clike|cmatch|creplace|ieq|ine|ilike|imatch|ireplace)\b</Rule>
+    <Rule color="Command">\b[A-Za-z]+-[A-Za-z][\w]*\b</Rule>
+    <Rule color="Parameter">(?&lt;=\s)-[A-Za-z_][\w]*:?</Rule>
+    <Rule color="Number">\b0x[0-9a-f]+\b|\b\d+(\.\d+)?([eE][+-]?\d+)?(kb|mb|gb|tb|pb)?\b</Rule>
+  </RuleSet>
+</SyntaxDefinition>

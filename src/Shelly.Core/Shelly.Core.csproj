@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- UI-free logic: settings, scripts, analysis, engines, safety, history, runs, builds, updates.
+       Plain net10.0 so the unit tests run on any OS; Windows-only calls are guarded with OperatingSystem.IsWindows(). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Shelly.Core</RootNamespace>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Analyzer.ps1" LogicalName="Shelly.Analyzer.ps1" />
+    <EmbeddedResource Include="Resources\ExeStub.cs.txt" LogicalName="Shelly.ExeStub.cs" WithCulture="false" />
+    <EmbeddedResource Include="Resources\Strings.json" LogicalName="Shelly.Strings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shelly.Core.Tests" />
+  </ItemGroup>
+</Project>

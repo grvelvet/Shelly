@@ -1,0 +1,35 @@
+# .NET build output
+bin/
+obj/
+publish/
+artifacts/
+*.user
+.vs/
+TestResults/
+
+# Build output of Shelly (keep the empty folder)
+build/*
+!build/.keep
+*.exe
+
+# Personal settings: favorites, language, trusted scripts, presets, window layout
+launcher-settings.json
+
+# Run history and saved output of runs
+launcher-history/
+
+# Icons picked for your own scripts
+assets/script-icons/
+
+# Temporary scripts written next to a built .exe while it runs (.<name>-<pid>.ps1)
+.*-[0-9]*.ps1
+
+# Files produced by the example scripts
+Scripts/usd_rub.png
+Scripts/System/System summary *.txt
+Scripts/System/System summary *.html
+
+# Windows and editor files
+Thumbs.db
+desktop.ini
+.vscode/
