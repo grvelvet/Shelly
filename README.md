@@ -58,8 +58,6 @@ outside the folder except the autostart entry (if you turn it on) and a cache in
 
 ![Shelly](docs/screenshot.png)
 
-> Screenshot not added yet. Save one as `docs/screenshot.png` (see [docs/README.md](docs/README.md)).
-
 ## Features
 
 - **Windows 11 look.** Fluent theme (with the Mica backdrop on Windows 11), light, dark or system theme, the Windows accent or one of nine accent
