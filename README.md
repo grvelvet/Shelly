@@ -11,9 +11,6 @@
 
 <p align="center"><b>A portable Windows 11-style launcher for PowerShell scripts.</b><br>
 Find, run, edit, check and build a .ps1 to .exe in one window.</p>
-
-<p align="center">Created by nah and Vika · <a href="https://github.com/grvelvet/Shelly">github.com/grvelvet/Shelly</a></p>
-
 <p align="center"><img src="docs/screenshot.png" alt="Shelly"></p>
 
 ## Download
