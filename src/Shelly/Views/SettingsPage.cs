@@ -16,6 +16,7 @@ public sealed class SettingsPage : UserControl, IPage
 {
     static AppState St => App.S;
     readonly StackPanel body = new() { Margin = new Thickness(36, 24, 36, 36), MaxWidth = 1000 };
+    bool _sourcesExpanded = false;
 
     public SettingsPage()
     {
@@ -289,38 +290,30 @@ public sealed class SettingsPage : UserControl, IPage
         Section(Loc.T("setUpdates"));
         Card(Glyphs.Update, Loc.T("setUpdateCheck"), Loc.T("setUpdateNote"), Toggle(s.UpdateCheck, on => { s.UpdateCheck = on; St.SaveSettings(); }));
 
-        // About: one card, Wintoys-style. Credit, repo and log on a single caption line.
+        // About: version, repo link, and log
         Section(Loc.T("setAbout"));
-        var line = new TextBlock();
-        line.SetResourceReference(StyleProperty, "Caption");
-        line.Inlines.Add(new Run(Loc.T("aboutCredit")));
+        var links = new WrapPanel();
         if (UpdateChecker.IsRepoSet(AppState.Repo))
         {
-            line.Inlines.Add(new Run("  ·  "));
-            var repo = new Hyperlink(new Run("GitHub")) { ToolTip = "github.com/" + AppState.Repo };
-            string url = "https://github.com/" + AppState.Repo;
-            repo.Click += (_, _) => ShellOps.Open(url);
-            line.Inlines.Add(repo);
+            var repoH = new Hyperlink(new Run("github.com/" + AppState.Repo)) { TextDecorations = null };
+            repoH.Click += (_, _) => ShellOps.Open("https://github.com/" + AppState.Repo);
+            var repoIcon = new TextBlock { Text = Glyphs.Globe, FontSize = 15, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 5, 0) };
+            repoIcon.SetResourceReference(TextBlock.FontFamilyProperty, "IconFont");
+            var repoText = new TextBlock(repoH) { VerticalAlignment = VerticalAlignment.Center };
+            var repoRow = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 16, 0), VerticalAlignment = VerticalAlignment.Center, ToolTip = Loc.T("aboutRepoTip") };
+            repoRow.Children.Add(repoIcon);
+            repoRow.Children.Add(repoText);
+            links.Children.Add(repoRow);
         }
         if (AppLog.FilePath != null)
         {
-            line.Inlines.Add(new Run("  ·  "));
-            var log = new Hyperlink(new Run(Loc.T("logTitle")));
-            log.Click += (_, _) => { if (File.Exists(AppLog.FilePath)) ShellOps.Open(AppLog.FilePath); };
-            line.Inlines.Add(log);
+            var logH = new Hyperlink(new Run(Loc.T("logTitle"))) { TextDecorations = null };
+            logH.Click += (_, _) => { if (File.Exists(AppLog.FilePath)) ShellOps.Open(AppLog.FilePath); };
+            links.Children.Add(new TextBlock(logH) { Margin = new Thickness(0, 0, 16, 0), VerticalAlignment = VerticalAlignment.Center });
         }
-        if (Updates.Latest != null)
-        {
-            line.Inlines.Add(new Run("  ·  " + Loc.F("updAvailable", Updates.Latest.Version, AppState.Version)));
-        }
-        var check = Btn(Loc.T("setUpdateNow"), async () =>
-        {
-            App.Status(Loc.T("updChecking"));
-            App.Status(await Updates.CheckAsync(true));
-            if (Updates.Latest != null) Build();
-        });
-        check.Margin = new Thickness(0);
-        Card("\uE946", "Shelly " + AppState.Version, null, check, line);
+        Card("\uE946", "Shelly " + AppState.Version,
+            Loc.F("setAboutHost", Environment.Version.ToString(3), SystemInfo.WindowsBuild),
+            links);
     }
 
     static StackPanel Stack(params UIElement[] els)
@@ -348,8 +341,8 @@ public sealed class SettingsPage : UserControl, IPage
         grid.AppendChild(ring);
         grid.AppendChild(fill);
         t.VisualTree = grid;
-        var hover = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };
-        hover.Setters.Add(new Setter(Shape.StrokeProperty, new DynamicResourceExtension("ControlStrokeColorSecondaryBrush"), "Ring"));
+        var hover = new Trigger { Property = IsMouseOverProperty, Value = true };
+        hover.Setters.Add(new Setter(Shape.StrokeProperty, new DynamicResourceExtension("ControlStrongStrokeColorDefaultBrush"), "Ring"));
         t.Triggers.Add(hover);
         var focus = new Trigger { Property = FocusRing.ShowProperty, Value = true };
         focus.Setters.Add(new Setter(Shape.StrokeProperty, new DynamicResourceExtension("FocusStrokeColorOuterBrush"), "Ring"));
@@ -389,29 +382,51 @@ public sealed class SettingsPage : UserControl, IPage
         {
             var dp = new DockPanel { Margin = new Thickness(0, 2, 0, 2) };
             string pat = u;
-            var rm = Btn(Loc.T("setSrcRemove"), () => { TrustedSources.Remove(s, pat); Changed(); Build(); });
+            var rm = Btn(Loc.T("setSrcRemove"), () => { TrustedSources.Remove(s, pat); Changed(); App.Status(Loc.F("srcRemoved", pat)); Build(); });
             DockPanel.SetDock(rm, Dock.Right);
             dp.Children.Add(rm);
-            dp.Children.Add(new TextBlock { Text = pat, VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis });
+            dp.Children.Add(new TextBlock { Text = u, VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis });
             list.Children.Add(dp);
         }
-        var add = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 8, 0, 0) };
-        var box = new TextBox { MinWidth = 260, VerticalContentAlignment = VerticalAlignment.Center };
-        var addBtn = Btn(Loc.T("setSrcAdd"), () =>
+        var box = new TextBox { MinWidth = 260, VerticalContentAlignment = VerticalAlignment.Center, ToolTip = Loc.T("setSrcAddTip") };
+        void AddIt()
         {
-            if (TrustedSources.Add(s, box.Text)) { box.Text = ""; Changed(); Build(); }
-            else App.Status(Loc.T("setSrcBad"), true);
-        });
-        add.Children.Add(box);
-        add.Children.Add(addBtn);
+            var p = TrustedSources.Normalize(box.Text);
+            if (p == null) { App.Status(Loc.F("srcInvalid", box.Text.Trim()), true); return; }
+            TrustedSources.Add(s, p); Changed(); App.Status(Loc.F("srcAdded", p)); Build();
+        }
+        box.KeyDown += (_, e) => { if (e.Key == Key.Enter) AddIt(); };
+        var add = Row(box, Btn(Loc.T("setSrcAdd"), AddIt));
+        add.Margin = new Thickness(0, 10, 0, 0);
         list.Children.Add(add);
-        Card(Glyphs.Globe, Loc.T("setSources"), Loc.T("setSourcesNote"), null, list);
+        list.Visibility = _sourcesExpanded ? Visibility.Visible : Visibility.Collapsed;
+
+        // Arrow button: ▾ expanded / ▸ collapsed
+        var arrow = new TextBlock
+        {
+            Text = _sourcesExpanded ? "▾" : "▸",
+            FontSize = 16,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(8, 0, 0, 0),
+            Cursor = System.Windows.Input.Cursors.Hand
+        };
+        var toggleBtn = new Button { Content = arrow, MinWidth = 0, Padding = new Thickness(4, 0, 4, 0) };
+        toggleBtn.Click += (_, _) =>
+        {
+            _sourcesExpanded = !_sourcesExpanded;
+            list.Visibility = _sourcesExpanded ? Visibility.Visible : Visibility.Collapsed;
+            arrow.Text = _sourcesExpanded ? "▾" : "▸";
+        };
+
+        Card(Glyphs.Globe, Loc.T("setSources"), Loc.T("setSourcesNote"), toggleBtn, list);
     }
+
+    // ---------- Hotkey ----------
 
     void BuildHotkey()
     {
         var s = St.Settings;
-        var box = new TextBox { Text = s.Hotkey.Length > 0 ? s.Hotkey : Loc.T("setHotkeyNone"), ToolTip = Loc.T("setHotkeyNote"), VerticalContentAlignment = VerticalAlignment.Center };
+        var box = new TextBox { Width = 170, IsReadOnly = true, Text = s.Hotkey.Length > 0 ? s.Hotkey : Loc.T("setHotkeyNone"), ToolTip = Loc.T("setHotkeyNote"), VerticalContentAlignment = VerticalAlignment.Center };
         var state = Caption("");
         state.SetResourceReference(TextBlock.ForegroundProperty, "SystemFillColorCriticalBrush");
         void ShowState(string text) { state.Text = text; state.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed; }
