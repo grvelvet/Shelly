@@ -1,8 +1,8 @@
 <Project>
   <PropertyGroup>
-    <Version>1.0.14</Version>
-    <AssemblyVersion>1.0.14.0</AssemblyVersion>
-    <FileVersion>1.0.14.0</FileVersion>
+    <Version>1.0.15</Version>
+    <AssemblyVersion>1.0.15.0</AssemblyVersion>
+    <FileVersion>1.0.15.0</FileVersion>
     <Product>Shelly</Product>
     <Authors>nah and Vika</Authors>
     <Company>nah and Vika</Company>
