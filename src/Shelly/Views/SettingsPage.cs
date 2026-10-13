@@ -109,6 +109,32 @@ public sealed class SettingsPage : UserControl, IPage
         return card;
     }
 
+    Border Card(string glyph, string title, UIElement desc, UIElement? right)
+    {
+        var g = new Grid();
+        g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(40) });
+        g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        var ic = Glyph(glyph);
+        ic.HorizontalAlignment = HorizontalAlignment.Left;
+        g.Children.Add(ic);
+        var sp = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 16, 0) };
+        sp.Children.Add(new TextBlock { Text = title, FontSize = 14 });
+        sp.Children.Add(desc);
+        Grid.SetColumn(sp, 1);
+        g.Children.Add(sp);
+        if (right != null)
+        {
+            if (right is FrameworkElement fe) fe.VerticalAlignment = VerticalAlignment.Center;
+            Grid.SetColumn(right, 2);
+            g.Children.Add(right);
+        }
+        var card = new Border { Child = g };
+        card.SetResourceReference(StyleProperty, "Card");
+        body.Children.Add(card);
+        return card;
+    }
+
     static CheckBox Toggle(bool on, Action<bool> changed)
     {
         var t = new CheckBox { IsChecked = on };
@@ -289,44 +315,38 @@ public sealed class SettingsPage : UserControl, IPage
         Section(Loc.T("setUpdates"));
         Card(Glyphs.Update, Loc.T("setUpdateCheck"), Loc.T("setUpdateNote"), Toggle(s.UpdateCheck, on => { s.UpdateCheck = on; St.SaveSettings(); }));
 
-        // About: name, version, credits, links, and the manual update check
+        // About: one card, Wintoys-style. Credit, repo and log on a single caption line.
         Section(Loc.T("setAbout"));
-        var updState = Caption(UpdateChecker.IsRepoSet(AppState.Repo) ? (Updates.Latest != null ? Loc.F("updAvailable", Updates.Latest.Version, AppState.Version) : "") : Loc.T("updNoRepo"));
-        updState.Visibility = updState.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-        var updRow = Row(Btn(Loc.T("setUpdateNow"), async () =>
-        {
-            updState.Visibility = Visibility.Visible;
-            updState.Text = Loc.T("updChecking");
-            updState.Text = await Updates.CheckAsync(true);
-            if (Updates.Latest != null) Build();
-        }));
-        if (Updates.Latest != null) updRow.Children.Add(Btn(Loc.T("updDownload"), Updates.OpenDownload, true));
-        var links = new WrapPanel();
+        var line = new TextBlock();
+        line.SetResourceReference(StyleProperty, "Caption");
+        line.Inlines.Add(new Run(Loc.T("aboutCredit")));
         if (UpdateChecker.IsRepoSet(AppState.Repo))
         {
-            var repo = Link("github.com/" + AppState.Repo, () => ShellOps.Open("https://github.com/" + AppState.Repo));
-            repo.ToolTip = Loc.T("aboutRepoTip");
-            links.Children.Add(repo);
+            line.Inlines.Add(new Run("  ·  "));
+            var repo = new Hyperlink(new Run("GitHub")) { ToolTip = "github.com/" + AppState.Repo };
+            string url = "https://github.com/" + AppState.Repo;
+            repo.Click += (_, _) => ShellOps.Open(url);
+            line.Inlines.Add(repo);
         }
-        var author = Link(Loc.T("aboutAuthor"), () => ShellOps.Open(AppState.AuthorUrl));
-        author.ToolTip = Loc.T("aboutAuthorTip") + "\n" + AppState.AuthorUrl;
-        links.Children.Add(author);
-        // User guide in the UI language: the local copy next to Shelly.exe, else the one on GitHub
-        string guide = Loc.Language == "ru" ? "USER_GUIDE_RU.md" : "USER_GUIDE.md";
-        string guidePath = System.IO.Path.Combine(St.Paths.Root, "docs", guide);
-        string? guideUrl = File.Exists(guidePath) ? guidePath
-            : UpdateChecker.IsRepoSet(AppState.Repo) ? $"https://github.com/{AppState.Repo}/blob/HEAD/docs/{guide}" : null;
-        if (guideUrl != null) { var g = Link(Loc.T("aboutGuide"), () => ShellOps.Open(guideUrl)); g.ToolTip = Loc.T("aboutGuideTip") + "\n" + guideUrl; links.Children.Add(g); }
-        foreach (var (name, tip) in new[] { ("README.md", "aboutReadmeTip"), ("CHANGELOG.md", "aboutChangelogTip"), ("LICENSE", "setLicense") })
+        if (AppLog.FilePath != null)
         {
-            string p = System.IO.Path.Combine(St.Paths.Root, name);
-            if (File.Exists(p)) { var l = Link(name, () => ShellOps.Open(p)); l.ToolTip = Loc.T(tip); links.Children.Add(l); }
+            line.Inlines.Add(new Run("  ·  "));
+            var log = new Hyperlink(new Run(Loc.T("logTitle")));
+            log.Click += (_, _) => { if (File.Exists(AppLog.FilePath)) ShellOps.Open(AppLog.FilePath); };
+            line.Inlines.Add(log);
         }
-        links.Children.Add(Link(Loc.T("aboutDisclaimer"), () => DisclaimerDialog.Show(false)));
-        if (AppLog.FilePath != null) links.Children.Add(Link(Loc.T("logTitle"), () => { if (File.Exists(AppLog.FilePath)) ShellOps.Open(AppLog.FilePath); }));
-        Card("\uE946", "Shelly " + AppState.Version,
-            Loc.T("aboutCredit") + "\n" + Loc.T("setAboutText") + "\n" + Loc.F("setAboutHost", Environment.Version.ToString(3), SystemInfo.WindowsBuild),
-            updRow, Stack(links, updState));
+        if (Updates.Latest != null)
+        {
+            line.Inlines.Add(new Run("  ·  " + Loc.F("updAvailable", Updates.Latest.Version, AppState.Version)));
+        }
+        var check = Btn(Loc.T("setUpdateNow"), async () =>
+        {
+            App.Status(Loc.T("updChecking"));
+            App.Status(await Updates.CheckAsync(true));
+            if (Updates.Latest != null) Build();
+        });
+        check.Margin = new Thickness(0);
+        Card("\uE946", "Shelly " + AppState.Version, line, check);
     }
 
     static StackPanel Stack(params UIElement[] els)

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Versions 0.9.x are the PowerShell + WPF edition (now in `legacy/`); 1.0.0 and later are the .NET edition.
 
 ## [Unreleased]
+## [1.0.12] - 2026-10-13
+
+### Changed
+
+- **About card.** One card, Windows 11 style: the app name and version, one caption line, and the update check on the right.
+- The caption line is the credit plus links to the GitHub repository and the log.
+- Removed the tagline and the extra links (author, README, CHANGELOG, license, disclaimer, user guide) from About.
 
 ## [1.0.11] - 2026-10-11
 
