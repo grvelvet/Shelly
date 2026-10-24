@@ -30,7 +30,7 @@ Use the small build. If the runtime is missing, Windows shows a download link, o
 Get-FileHash .\shelly-1.4.1.zip -Algorithm SHA256
 ```
 
-`Shelly.exe` is not code-signed. SmartScreen may warn. After the checksum matches: **More info → Run anyway**. If the browser marked the zip, unblock it first: `Unblock-File .\shelly-1.2.0.zip`.
+`Shelly.exe` is not code-signed. SmartScreen may warn. After the checksum matches: **More info → Run anyway**. If the browser marked the zip, unblock it first: `Unblock-File .\shelly-1.x.x.zip`.
 
 ## What it does
 
