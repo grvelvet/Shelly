@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>Shelly</RootNamespace>
+    <AssemblyName>Shelly</AssemblyName>
+    <ApplicationIcon>Assets\shelly.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- ThemeMode (Fluent) is marked experimental -->
+    <NoWarn>$(NoWarn);WPF0001;CA1416;WFO0003</NoWarn>
+    <!-- Framework-dependent by default: a small exe that needs the .NET 10 Desktop Runtime.
+         When the runtime is missing, the apphost shows the standard Windows dialog with a download link. -->
+    <SelfContained>false</SelfContained>
+    <RollForward>Major</RollForward>
+    <PublishSingleFile>true</PublishSingleFile>
+    <DebugType>embedded</DebugType>
+    <SatelliteResourceLanguages>en;ru</SatelliteResourceLanguages>
+    <!-- Dynamic PGO (the .NET default, stated so it isn't switched off by accident). ReadyToRun is off on purpose:
+         measured for 1.0.6 it grows Shelly.exe from 1.93 to 3.45 MB (zip 0.72 -> 1.46 MB) while WPF and the rest of the
+         framework, most of the start-up code, are precompiled already. Try it with -p:PublishReadyToRun=true and
+         compare the perf log (Shelly.exe with the perf switch, see README). -->
+    <TieredPGO>true</TieredPGO>
+    <TieredCompilation>true</TieredCompilation>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(SelfContained)' == 'true'">
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Using Include="System.IO" />
+    <Using Include="Shelly.Dialogs.Glyphs" Alias="Glyphs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shelly.Core\Shelly.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\shelly.ico" />
+    <!-- 1.1.2: the mascot (450 x 600, about 42 KB; the full-size original is assets/mascot.jpg, not embedded) -->
+    <Resource Include="Assets\mascot.jpg" />
+    <EmbeddedResource Include="Editor\PowerShell.xshd" LogicalName="Shelly.PowerShell.xshd" />
+    <EmbeddedResource Include="Editor\Batch.xshd" LogicalName="Shelly.Batch.xshd" />
+  </ItemGroup>
+</Project>

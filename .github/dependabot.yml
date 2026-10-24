@@ -1,0 +1,19 @@
+# Weekly pull requests for the NuGet packages (Directory.Packages.props) and the GitHub Actions of the workflows.
+# CI shows the Shelly.exe size of each one in the run summary: check it before merging an AvalonEdit update.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      tests:
+        patterns: ["Microsoft.NET.Test.Sdk", "xunit*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

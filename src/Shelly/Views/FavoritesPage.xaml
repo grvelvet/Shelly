@@ -1,0 +1,79 @@
+<UserControl x:Class="Shelly.Views.FavoritesPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Shelly.Views">
+    <Grid Margin="36,24,36,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <!-- Header: title; size and sort on the right (the same icon buttons and menus as the script list toolbar) -->
+        <DockPanel Margin="0,0,0,16">
+            <Button x:Name="SortBtn" DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE8CB;" VerticalAlignment="Center" />
+            <Button x:Name="SizeBtn" DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE71E;" VerticalAlignment="Center" />
+            <TextBlock Style="{StaticResource PageTitle}" Text="{Binding [navFavorites], Source={x:Static v:L.I}}" HorizontalAlignment="Left" />
+        </DockPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" v:ScrollGutter.Enabled="True">
+            <ItemsControl x:Name="Tiles">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type v:ScriptRow}">
+                        <!-- Size values come from the page resources (FavTile*, set from Layout.FavoriteTiles by the size choice) -->
+                        <Border x:Name="Tile" Width="{DynamicResource FavTileWidth}" Height="{DynamicResource FavTileHeight}" Margin="0,0,8,8" CornerRadius="8"
+                                BorderThickness="1" Padding="{DynamicResource FavTilePadding}"
+                                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                ToolTip="{Binding Tip}" ToolTipService.InitialShowDelay="900" Tag="{Binding}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <DockPanel>
+                                    <Grid Width="{DynamicResource FavTileIcon}" Height="{DynamicResource FavTileIcon}" DockPanel.Dock="Left" Margin="{DynamicResource FavTileIconMargin}">
+                                        <Border CornerRadius="6" Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                                Visibility="{Binding HasIcon, Converter={StaticResource InvBoolVis}}">
+                                            <TextBlock Style="{StaticResource Glyph}" Text="{Binding Glyph}" FontSize="{DynamicResource FavTileGlyph}" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                                        </Border>
+                                        <Image Source="{Binding Icon}" Width="{DynamicResource FavTileImage}" Height="{DynamicResource FavTileImage}" Visibility="{Binding HasIcon, Converter={StaticResource BoolVis}}" />
+                                    </Grid>
+                                    <!-- 1.2.0: on a schedule -->
+                                    <Border DockPanel.Dock="Right" Background="Transparent" ToolTip="{Binding ScheduleTip}" Margin="4,0,0,0" VerticalAlignment="Center"
+                                            Visibility="{Binding HasSchedule, Converter={StaticResource BoolVis}}">
+                                        <TextBlock Style="{StaticResource Glyph}" Text="&#xE121;" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    </Border>
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="{DynamicResource FavTileName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                </DockPanel>
+                                <TextBlock Grid.Row="1" Text="{Binding Desc}" FontSize="{DynamicResource FavTileDesc}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Margin="{DynamicResource FavTileDescMargin}"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <DockPanel Grid.Row="2">
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsRunning, Converter={StaticResource BoolVis}}">
+                                            <TextBlock Style="{StaticResource Spinner}" />
+                                            <TextBlock Text="{Binding Elapsed}" FontSize="12" Margin="6,0,2,0" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                                            <Button Style="{StaticResource IconButton}" Content="&#xE71A;" Click="TileStop" Tag="{Binding}"
+                                                    Foreground="{DynamicResource SystemFillColorCriticalBrush}" ToolTip="{Binding [rowStopTip], Source={x:Static v:L.I}}" />
+                                        </StackPanel>
+                                        <Button Style="{StaticResource IconButton}" Content="&#xE768;" Click="TileRun" Tag="{Binding}"
+                                                Visibility="{Binding NotRunning, Converter={StaticResource BoolVis}}"
+                                                Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" ToolTip="{Binding [runTip], Source={x:Static v:L.I}}" />
+                                        <Button Style="{StaticResource IconButton}" Content="&#xE713;" Click="TileSettings" Tag="{Binding}"
+                                                ToolTip="{Binding [rsTip], Source={x:Static v:L.I}}" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding LastLine}" ToolTip="{Binding LastTip}" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                </DockPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <v:EmptyState x:Name="Empty" Grid.Row="1" Visibility="Collapsed" />
+    </Grid>
+</UserControl>

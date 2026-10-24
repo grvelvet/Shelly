@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SyntaxDefinition name="PowerShell" extensions=".ps1" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    <Color name="Comment" foreground="#008000" />
+    <Color name="String" foreground="#A31515" />
+    <Color name="Variable" foreground="#001080" />
+    <Color name="Keyword" foreground="#AF00DB" fontWeight="semibold" />
+    <Color name="Command" foreground="#795E26" />
+    <Color name="Parameter" foreground="#555555" />
+    <Color name="Number" foreground="#098658" />
+    <Color name="Type" foreground="#267F99" />
+    <Color name="Operator" foreground="#555555" />
+    <Color name="Requires" foreground="#0000FF" fontWeight="semibold" />
+
+    <RuleSet ignoreCase="true">
+        <Span color="Comment">
+            <Begin>&lt;#</Begin>
+            <End>#&gt;</End>
+        </Span>
+        <Rule color="Requires">^\s*#requires\b.*$</Rule>
+        <Rule color="Comment">#.*$</Rule>
+
+        <Span color="String" multiline="true">
+            <Begin>@"|@'</Begin>
+            <End>"@|'@</End>
+        </Span>
+        <Span color="String" multiline="true">
+            <Begin>"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <Span begin="`" end="." />
+                <Rule color="Variable">\$(\{[^{}]+\}|[A-Za-z_][\w:]*)</Rule>
+            </RuleSet>
+        </Span>
+        <Span color="String" multiline="true">
+            <Begin>'</Begin>
+            <End>'</End>
+        </Span>
+
+        <Rule color="Variable">\$(?:global:|script:|local:|private:|env:|using:)?(\{[^{}]+\}|\?|\^|\$|_|\b[A-Za-z_][\w:]*)</Rule>
+        <Rule color="Variable">@[A-Za-z_][\w]*</Rule>
+        <Rule color="Type">\[[A-Za-z_][\w.,\[\]\s]*(?:\([^\]\r\n]*\))?\]</Rule>
+        <Rule color="Parameter">(?&lt;=\s)-[A-Za-z_][\w]*:?</Rule>
+
+        <Keywords color="Keyword">
+            <Word>begin</Word><Word>break</Word><Word>catch</Word><Word>class</Word><Word>continue</Word>
+            <Word>data</Word><Word>define</Word><Word>do</Word><Word>dynamicparam</Word><Word>else</Word>
+            <Word>elseif</Word><Word>end</Word><Word>enum</Word><Word>exit</Word><Word>filter</Word>
+            <Word>finally</Word><Word>for</Word><Word>foreach</Word><Word>from</Word><Word>function</Word>
+            <Word>hidden</Word><Word>if</Word><Word>in</Word><Word>inlinescript</Word><Word>parallel</Word>
+            <Word>param</Word><Word>process</Word><Word>return</Word><Word>sequence</Word><Word>static</Word>
+            <Word>switch</Word><Word>throw</Word><Word>trap</Word><Word>try</Word><Word>until</Word>
+            <Word>using</Word><Word>var</Word><Word>while</Word><Word>workflow</Word>
+        </Keywords>
+
+        <Rule color="Operator">\b-(eq|ne|gt|ge|lt|le|like|notlike|match|notmatch|contains|notcontains|in|notin|replace|split|join|is|isnot|as|and|or|xor|not|band|bor|bxor|bnot|shl|shr|f)\b</Rule>
+        <Rule color="Command">\b[A-Za-z]+-[A-Za-z][\w]*\b</Rule>
+        <Rule color="Number">\b0x[0-9a-fA-F]+\b|\b\d+(\.\d+)?([eE][+-]?\d+)?(kb|mb|gb|tb|pb)?\b</Rule>
+    </RuleSet>
+</SyntaxDefinition>

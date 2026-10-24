@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SyntaxDefinition name="Batch" extensions=".bat;.cmd" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    <Color name="Comment" foreground="#008000" />
+    <Color name="String" foreground="#A31515" />
+    <Color name="Variable" foreground="#001080" />
+    <Color name="Keyword" foreground="#AF00DB" fontWeight="semibold" />
+    <Color name="Command" foreground="#795E26" />
+    <Color name="Label" foreground="#267F99" fontWeight="semibold" />
+    <Color name="Number" foreground="#098658" />
+    <Color name="Operator" foreground="#555555" />
+
+    <RuleSet ignoreCase="true">
+        <Rule color="Comment">^\s*(?:rem\b|::).*$</Rule>
+        <Rule color="Label">^\s*:[A-Za-z0-9_.\-]+</Rule>
+        <Rule color="Label">(?&lt;=\b(?:goto|call)\s+):?[A-Za-z0-9_.\-]+</Rule>
+
+        <Span color="String" multiline="false">
+            <Begin>"</Begin>
+            <End>"</End>
+        </Span>
+
+        <!-- Batch variables: %VAR%, !VAR!, %%i, %~dp0, %1..%9, %* -->
+        <Rule color="Variable">%~[fdpnxsatz]*(?:\$[A-Za-z_]+:)?[0-9A-Za-z]</Rule>
+        <Rule color="Variable">%%~?[fdpnxsatz]*[A-Za-z]</Rule>
+        <Rule color="Variable">%[0-9\*]</Rule>
+        <Rule color="Variable">%[A-Za-z_][A-Za-z0-9_]*(?::[^%]+)?%</Rule>
+        <Rule color="Variable">![A-Za-z_][A-Za-z0-9_]*(?::[^!]+)?!</Rule>
+
+        <Keywords color="Keyword">
+            <Word>if</Word><Word>else</Word><Word>for</Word><Word>in</Word><Word>do</Word>
+            <Word>goto</Word><Word>call</Word><Word>exit</Word><Word>not</Word><Word>exist</Word>
+            <Word>defined</Word><Word>errorlevel</Word><Word>cmdextversion</Word>
+            <Word>equ</Word><Word>neq</Word><Word>lss</Word><Word>leq</Word><Word>gtr</Word><Word>geq</Word>
+        </Keywords>
+
+        <Keywords color="Command">
+            <Word>echo</Word><Word>set</Word><Word>setlocal</Word><Word>endlocal</Word>
+            <Word>pause</Word><Word>chcp</Word><Word>shift</Word><Word>start</Word>
+            <Word>cd</Word><Word>chdir</Word><Word>pushd</Word><Word>popd</Word>
+            <Word>dir</Word><Word>copy</Word><Word>xcopy</Word><Word>robocopy</Word>
+            <Word>move</Word><Word>ren</Word><Word>rename</Word><Word>del</Word><Word>erase</Word>
+            <Word>md</Word><Word>mkdir</Word><Word>rd</Word><Word>rmdir</Word><Word>type</Word>
+            <Word>cls</Word><Word>title</Word><Word>color</Word><Word>prompt</Word><Word>path</Word>
+            <Word>assoc</Word><Word>ftype</Word><Word>ver</Word><Word>vol</Word><Word>mklink</Word>
+            <Word>find</Word><Word>findstr</Word><Word>more</Word><Word>sort</Word><Word>timeout</Word>
+            <Word>tasklist</Word><Word>taskkill</Word><Word>reg</Word><Word>sc</Word><Word>net</Word>
+            <Word>icacls</Word><Word>attrib</Word><Word>where</Word><Word>whoami</Word><Word>choice</Word>
+            <Word>powershell</Word><Word>pwsh</Word><Word>cmd</Word><Word>rem</Word>
+        </Keywords>
+
+        <Rule color="Number">\b0x[0-9a-fA-F]+\b|\b\d+\b</Rule>
+        <Rule color="Operator">[|&amp;&lt;&gt;@=~+\-*/()]|2&gt;&amp;1|1&gt;&amp;2</Rule>
+    </RuleSet>
+</SyntaxDefinition>

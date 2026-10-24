@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>Shelly (small sizes: 16-32 px)</title>
+  <!-- Simplified for 16/20/24/32 px: flat colours, no face details or shadow, bigger eyes, thicker prompt, minimal padding -->
+  <!-- eye stalks -->
+  <path d="M54 126 L38 46" stroke="#F4775C" stroke-width="20" stroke-linecap="round"/>
+  <path d="M86 126 L102 46" stroke="#F4775C" stroke-width="20" stroke-linecap="round"/>
+  <!-- head and foot -->
+  <path d="M8 206 C2 150 28 110 68 110 C102 110 118 134 122 162 L222 176 C242 178 254 192 254 210 C254 228 240 240 220 240 L40 240 C18 240 10 228 8 206 Z" fill="#F4775C"/>
+  <!-- shell: terminal window -->
+  <rect x="100" y="34" width="156" height="156" rx="56" fill="#E2553D"/>
+  <rect x="119" y="53" width="118" height="118" rx="34" fill="#4B8DF0"/>
+  <path d="M146 88 L182 114 L146 140" fill="none" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M192 152 L216 152" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round"/>
+  <!-- tail in front of the shell -->
+  <path d="M106 240 L106 198 C150 190 192 184 222 182 C242 182 254 194 254 211 C254 228 240 240 220 240 Z" fill="#F4775C"/>
+  <!-- eyes -->
+  <circle cx="36" cy="38" r="33" fill="#F4775C"/>
+  <circle cx="36" cy="38" r="25" fill="#FFFFFF"/>
+  <circle cx="39" cy="40" r="14" fill="#1F2A4D"/>
+  <circle cx="104" cy="38" r="33" fill="#F4775C"/>
+  <circle cx="104" cy="38" r="25" fill="#FFFFFF"/>
+  <circle cx="107" cy="40" r="14" fill="#1F2A4D"/>
+</svg>

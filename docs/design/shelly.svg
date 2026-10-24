@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>Shelly</title>
+  <defs>
+    <linearGradient id="body" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="224">
+      <stop offset="0" stop-color="#FF9378"/>
+      <stop offset="1" stop-color="#F26A52"/>
+    </linearGradient>
+    <linearGradient id="lipHi" gradientUnits="userSpaceOnUse" x1="0" y1="186" x2="0" y2="200">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF8466"/>
+      <stop offset="1" stop-color="#E8573F"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B8FEA"/>
+      <stop offset="1" stop-color="#5FB0FF"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7FA8F0" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#7FA8F0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g transform="translate(-3 6) scale(0.94)">
+  <!-- ground shadow -->
+  <ellipse cx="136" cy="225" rx="114" ry="12" fill="url(#shadow)"/>
+
+  <!-- eye stalks -->
+  <path d="M62 112 C60 90 54 70 50 48" fill="none" stroke="#F47A60" stroke-width="10" stroke-linecap="round"/>
+  <path d="M94 112 C96 90 100 70 104 48" fill="none" stroke="#F47A60" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- head and foot (one body; the back continues under the shell) -->
+  <path d="M36 186 C28 146 44 106 80 106 C110 106 126 124 132 146 L170 150 L170 182 L214 182 C234 182 246 192 246 203 C246 214 236 222 214 222 L62 222 C44 222 38 208 36 186 Z" fill="url(#body)"/>
+
+  <!-- shell: rounded terminal window -->
+  <g transform="rotate(-5 182 126)">
+    <rect x="116" y="60" width="132" height="132" rx="54" fill="url(#rim)"/>
+    <rect x="132" y="76" width="96" height="96" rx="30" fill="url(#screen)"/>
+    <rect x="132" y="76" width="96" height="96" rx="30" fill="none" stroke="#2F5FC4" stroke-opacity="0.18" stroke-width="2"/>
+    <!-- >_ prompt -->
+    <path d="M154 106 L178 122 L154 138" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M184 144 L206 144" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+  </g>
+
+  <!-- foot front lip: the tail passes in front of the shell -->
+  <path d="M100 222 L100 204 C130 200 176 192 214 189 C234 188 246 196 246 205 C246 215 236 222 214 222 Z" fill="url(#body)"/>
+  <path d="M120 201 C156 196 190 191 214 189 C230 189 240 194 243 200" fill="none" stroke="url(#lipHi)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- face -->
+  <ellipse cx="44" cy="156" rx="9" ry="6" fill="#FF6B7A" opacity="0.55"/>
+  <ellipse cx="102" cy="156" rx="9" ry="6" fill="#FF6B7A" opacity="0.55"/>
+  <path d="M63 150 Q73 160 83 150" fill="none" stroke="#3A2230" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- eyes on the stalk tips -->
+  <g>
+    <circle cx="50" cy="44" r="20" fill="#F47A60"/>
+    <circle cx="50" cy="44" r="14" fill="#FFFFFF"/>
+    <circle cx="51" cy="45" r="8" fill="#1F2A4D"/>
+    <circle cx="54" cy="41" r="2.8" fill="#FFFFFF"/>
+    <circle cx="104" cy="44" r="20" fill="#F47A60"/>
+    <circle cx="104" cy="44" r="14" fill="#FFFFFF"/>
+    <circle cx="105" cy="45" r="8" fill="#1F2A4D"/>
+    <circle cx="108" cy="41" r="2.8" fill="#FFFFFF"/>
+  </g>
+  </g>
+</svg>

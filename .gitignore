@@ -1,0 +1,33 @@
+# Build output: build.ps1 and dotnet write everything to artifacts/ (bin, obj, publish, test-results, dist)
+artifacts/
+# The per-project layout before build.ps1 (dotnet build with UseArtifactsOutput off, old build.bat)
+bin/
+obj/
+publish/
+TestResults/
+*.trx
+*.user
+.vs/
+
+# Shelly's own build/ folder at run time (Build .exe writes there; keep the empty folder) and Shelly.exe copied to
+# the root by build.ps1 local: not build output of the repository, keep these
+build/*
+!build/.keep
+*.exe
+
+# Personal settings: favorites, language, trusted scripts, presets, window layout
+launcher-settings.json
+
+# Run history and saved output of runs
+launcher-history/
+
+# Icons picked for your own scripts
+assets/script-icons/
+
+# Temporary scripts written next to a built .exe while it runs (.<name>-<pid>.ps1)
+.*-[0-9]*.ps1
+
+# Windows and editor files
+Thumbs.db
+desktop.ini
+.vscode/

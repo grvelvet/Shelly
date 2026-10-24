@@ -1,0 +1,61 @@
+<Project>
+  <!-- Shared by every project. Build with build.ps1 (see README, "Build from source"); plain dotnet build works too. -->
+
+  <!-- Output: everything under artifacts\ (bin, obj, publish, packages, test results, release zips) instead of
+       bin\ and obj\ next to each project. Must be set before the SDK is imported, which is why it is here. -->
+  <PropertyGroup>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+  </PropertyGroup>
+
+  <!-- Version: the one number to change for a release is VersionPrefix. A release (build.ps1 -Version from the v* tag,
+       which must match it) has no suffix; every other build is "1.4.0-dev" with the commit after "+" in the product
+       version. Assembly and file versions are always the plain number (1.4.0.0): the About box and the update check
+       read the assembly version. -->
+  <PropertyGroup>
+    <VersionPrefix>1.4.1</VersionPrefix>
+    <VersionSuffix Condition="'$(ShellyRelease)' != 'true' and '$(VersionSuffix)' == ''">dev</VersionSuffix>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+    <Product>Shelly</Product>
+    <Authors>grvelvet</Authors>
+    <Company>grvelvet</Company>
+    <Copyright>Copyright (c) 2026 grvelvet</Copyright>
+    <!-- GitHub repository (owner/name) for the update check and the About links. -->
+    <ShellyGitHubRepo>grvelvet/shelly</ShellyGitHubRepo>
+    <RepositoryUrl>https://github.com/grvelvet/Shelly</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <!-- Language and checks -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- 1.3.1: a clean build stays clean. The code style rules of .editorconfig (unused usings, members, parameters,
+         disposal) run in the build; IDE0005 needs the documentation file, which is not published. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- A new advisory for a package (NuGet audit) is a warning, not a failed release build on the day it is published:
+         Dependabot opens the update. -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PublishDocumentationFile>false</PublishDocumentationFile>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+  </PropertyGroup>
+
+  <!-- Reproducible builds. Source Link (built into the .NET SDK) puts the commit and the GitHub URL in the embedded PDB;
+       on GitHub Actions the paths are normalized (/_/). Untracked (generated) sources are not embedded: they would
+       grow Shelly.exe. -->
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <DebugType>embedded</DebugType>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <EmbedUntrackedSources>false</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="ShellyGitHubRepo" Value="$(ShellyGitHubRepo)" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,19 @@
+# Windows scripts keep CRLF line endings in the working tree.
+# Files are stored byte-for-byte otherwise, so the UTF-8 BOM that Windows PowerShell 5.1
+# needs for non-English text is preserved (no working-tree-encoding is set on purpose).
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.png binary
+*.ico binary
+*.jpg binary
+
+*.cs text eol=crlf
+*.xaml text eol=crlf
+*.csproj text eol=crlf
+*.slnx text eol=crlf
+*.props text eol=crlf
+*.xshd text eol=crlf
+*.json text eol=crlf
+*.md text

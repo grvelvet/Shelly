@@ -1,0 +1,34 @@
+# Shelly 1.3.1: rules checked in every build (Directory.Build.props: EnforceCodeStyleInBuild, TreatWarningsAsErrors).
+# They come from the 1.3.0 code audit: dead code (usings, private members, parameters, assignments) and disposal.
+root = true
+
+[*.cs]
+# Unused code
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.IDE0035.severity = warning
+dotnet_diagnostic.IDE0051.severity = warning
+dotnet_diagnostic.IDE0052.severity = warning
+dotnet_diagnostic.IDE0059.severity = warning
+dotnet_diagnostic.IDE0060.severity = warning
+dotnet_diagnostic.IDE0080.severity = warning
+dotnet_diagnostic.IDE0100.severity = warning
+dotnet_diagnostic.IDE0110.severity = warning
+dotnet_diagnostic.CA1823.severity = warning
+# Disposal
+dotnet_diagnostic.CA1001.severity = warning
+dotnet_diagnostic.CA2000.severity = warning
+dotnet_diagnostic.CA2213.severity = warning
+# The documentation file is generated only for IDE0005: missing or loose XML comments are not warnings
+dotnet_diagnostic.CS1570.severity = none
+dotnet_diagnostic.CS1572.severity = none
+dotnet_diagnostic.CS1573.severity = none
+dotnet_diagnostic.CS1574.severity = none
+dotnet_diagnostic.CS1580.severity = none
+dotnet_diagnostic.CS1584.severity = none
+dotnet_diagnostic.CS1587.severity = none
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.CS1658.severity = none
+dotnet_diagnostic.CS1711.severity = none
+dotnet_diagnostic.CS1712.severity = none
+dotnet_diagnostic.CS1723.severity = none
+dotnet_diagnostic.CS1734.severity = none
