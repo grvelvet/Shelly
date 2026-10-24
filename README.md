@@ -9,7 +9,7 @@
   <img alt="MIT" src="https://img.shields.io/badge/license-MIT-green">
 </p>
 
-<p align="center"><b>A portable Windows 11-style launcher for PowerShell and Python scripts.</b><br>
+<p align="center"><b>A portable Windows 11-style launcher for PowerShell, Python and other scripts.</b><br>
 Find, run, edit, check and build a .ps1 to .exe in one window. Run .py scripts the same way.</p>
 <p align="center"><img src="docs/screenshot.png" alt="Shelly"></p>
 
