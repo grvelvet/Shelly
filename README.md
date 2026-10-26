@@ -9,7 +9,7 @@
   <img alt="MIT" src="https://img.shields.io/badge/license-MIT-green">
 </p>
 
-<p align="center"><b>A portable Windows 11-style launcher for PowerShell and Python scripts.</b><br>
+<p align="center"><b>A portable Windows 11-style launcher for PowerShell, Python and other scripts.</b><br>
 Find, run, edit, check and build a .ps1 to .exe in one window. Run .py scripts the same way.</p>
 <p align="center"><img src="docs/screenshot.png" alt="Shelly"></p>
 
@@ -30,7 +30,7 @@ Use the small build. If the runtime is missing, Windows shows a download link, o
 Get-FileHash .\shelly-1.4.1.zip -Algorithm SHA256
 ```
 
-`Shelly.exe` is not code-signed. SmartScreen may warn. After the checksum matches: **More info → Run anyway**. If the browser marked the zip, unblock it first: `Unblock-File .\shelly-1.2.0.zip`.
+`Shelly.exe` is not code-signed. SmartScreen may warn. After the checksum matches: **More info → Run anyway**. If the browser marked the zip, unblock it first: `Unblock-File .\shelly-1.x.x.zip`.
 
 ## What it does
 
