@@ -111,6 +111,7 @@ public sealed class InlineRunner : IDisposable
     void Finish(int what)
     {
         bool fire = false;
+        Process? p = null;
         lock (gate)
         {
             if (what == 0) outDone = true; else if (what == 1) errDone = true; else exited = true;
@@ -119,18 +120,15 @@ public sealed class InlineRunner : IDisposable
             try { code = Proc!.ExitCode; } catch { }
             ExitCode = code;
             Running = false;
+            // The process object holds handles: clear and release them before notifying Finished listeners
+            p = Proc;
+            Proc = null;
             fire = true;
         }
         if (!fire) return;
         try { graceCts.Cancel(); } catch { }
-        try { Finished?.Invoke(this); }
-        finally
-        {
-            // The process object holds handles: release them once the run is complete
-            var p = Proc;
-            Proc = null;
-            try { p?.Dispose(); } catch { }
-        }
+        try { p?.Dispose(); } catch { }
+        Finished?.Invoke(this);
     }
 
     /// <summary>Starts <paramref name="exe"/> in <paramref name="workDir"/>; <paramref name="env"/> adds environment variables

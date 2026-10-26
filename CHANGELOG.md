@@ -31,6 +31,9 @@ Versions 0.9.x were the PowerShell + WPF edition; 1.0.0 and later are the .NET e
 - **History store thread-safety & atomic output writes (`HistoryStore`):** synchronized all reads and mutations of
   `Entries` and `removed` (`Add`, `Remove`, `Clear`, `Limit`, `RemoveOrphanOutputs`, `Get`, `LastOf`, `MoveRel`) under
   `lock (Entries)` and switched `SaveOutput` to `AtomicFile.WriteAllText`.
+- **`InlineRunner` process release ordering (`Runner.cs`):** cleared `Proc` inside `lock (gate)` and disposed the process
+  handle *before* raising `Finished`, eliminating a race condition where listeners waking on `Finished` could observe a
+  non-null `Proc` before the `finally` block ran (`HardeningTests.Runner_ends_without_waiting_and_releases_the_process`).
 
 ## [1.4.1] - 2026-10-24
 
