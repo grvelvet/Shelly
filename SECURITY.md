@@ -6,8 +6,8 @@ Security fixes go into the latest release of the .NET edition only. Please updat
 
 | Version | Supported |
 |---|---|
-| 1.2.0 (latest) | yes |
-| 1.1.2 | no |
+| 1.4.2 (latest) | yes |
+| < 1.4.2 | no |
 
 ## Reporting a vulnerability
 

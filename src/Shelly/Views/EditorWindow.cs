@@ -399,6 +399,28 @@ public sealed class EditorWindow : Window
         ["Preprocessor"] = "#C586C0", ["Operator"] = "#B4B4B4", ["Punctuation"] = "#D4D4D4"
     };
 
+    static readonly Dictionary<(string, string), HighlightingBrush?> OriginalGenericBrushes = new();
+
+    static void ApplyGenericThemeColors(IHighlightingDefinition? def, bool isDark)
+    {
+        if (def == null) return;
+        foreach (var c in def.NamedHighlightingColors)
+        {
+            var key = (def.Name, c.Name);
+            if (!OriginalGenericBrushes.ContainsKey(key))
+                OriginalGenericBrushes[key] = c.Foreground;
+            if (isDark)
+            {
+                if (GenericDarkColors.TryGetValue(c.Name, out var hex))
+                    c.Foreground = new SimpleHighlightingBrush((Color)ColorConverter.ConvertFromString(hex));
+            }
+            else if (OriginalGenericBrushes.TryGetValue(key, out var orig))
+            {
+                c.Foreground = orig;
+            }
+        }
+    }
+
     void LoadHighlighting()
     {
         try
@@ -429,14 +451,7 @@ public sealed class EditorWindow : Window
             else if (!IsPowerShell)
             {
                 def = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(path));
-                if (def != null && ThemeManager.IsDark)
-                {
-                    foreach (var c in def.NamedHighlightingColors)
-                    {
-                        if (GenericDarkColors.TryGetValue(c.Name, out var hex))
-                            c.Foreground = new SimpleHighlightingBrush((Color)ColorConverter.ConvertFromString(hex));
-                    }
-                }
+                ApplyGenericThemeColors(def, ThemeManager.IsDark);
             }
             else
             {

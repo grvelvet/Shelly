@@ -6,13 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-#if LAUNCHER
-[assembly: AssemblyTitle("Shelly")]
-[assembly: AssemblyProduct("Shelly")]
-[assembly: AssemblyDescription("Shelly - a Windows 11-style launcher for PowerShell scripts")]
 [assembly: AssemblyVersion("%VERSION%")]
 [assembly: AssemblyFileVersion("%VERSION%")]
-#endif
 
 static class Program
 {
@@ -22,7 +17,6 @@ static class Program
     const string MsgTempFail = %MSG_TEMPFAIL%;
     const string MsgPsFail = %MSG_PSFAIL%;
     // Engine: "7" (PowerShell 7) or "5.1" (Windows PowerShell); "auto" = PowerShell 7 when installed.
-    // The SHELLY_HOST environment variable (auto | 7 | 5.1) overrides it for Shelly.exe.
     const string Engine = %ENGINE%;
     const string MsgEngineFallback = %MSG_ENGINEFALLBACK%;
 
@@ -102,63 +96,22 @@ static class Program
         return File.Exists(s) ? s : null;
     }
 
-#if LAUNCHER
-    static string SettingsHost()
-    {
-        try
-        {
-            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string f = Path.Combine(dir, "launcher-settings.json");
-            if (!File.Exists(f) && !Directory.Exists(Path.Combine(dir, "Scripts")))
-            {
-                string up = Path.GetDirectoryName(dir);
-                if (up != null && File.Exists(Path.Combine(up, "launcher-settings.json"))) f = Path.Combine(up, "launcher-settings.json");
-            }
-            if (!File.Exists(f)) return null;
-            System.Text.RegularExpressions.Match m = System.Text.RegularExpressions.Regex.Match(File.ReadAllText(f),
-                "\"launcherHost\"\\s*:\\s*\"(auto|7|5\\.1)\"");
-            return m.Success ? m.Groups[1].Value : null;
-        }
-        catch { return null; }
-    }
-#endif
-
     static string PowerShellExe()
     {
         string want = Engine;
-#if LAUNCHER
-        string env = Environment.GetEnvironmentVariable("SHELLY_HOST");
-        if (!string.IsNullOrEmpty(env))
-        {
-            env = env.Trim().ToLowerInvariant();
-            if (env == "7" || env == "pwsh") want = "7";
-            else if (env == "5.1" || env == "5" || env == "powershell") want = "5.1";
-            else if (env == "auto") want = "auto";
-        }
-        else
-        {
-            // Settings > Environment (formerly Engines) > "Shelly runs on" (launcherHost in launcher-settings.json) is read at every start
-            string h = SettingsHost();
-            if (h != null) want = h;
-        }
-#endif
         string seven = Pwsh();
         string five = WinPs();
         if (want == "auto") return seven ?? five ?? "powershell.exe";
         if (want == "7")
         {
             if (seven != null) return seven;
-#if !LAUNCHER
             Console.Error.WriteLine(string.Format(MsgEngineFallback, "PowerShell 7", "Windows PowerShell 5.1"));
-#endif
             return five ?? "powershell.exe";
         }
         if (five != null) return five;
         if (seven != null)
         {
-#if !LAUNCHER
             Console.Error.WriteLine(string.Format(MsgEngineFallback, "Windows PowerShell 5.1", "PowerShell 7"));
-#endif
             return seven;
         }
         return "powershell.exe";
@@ -166,7 +119,15 @@ static class Program
 
     static string WriteScript(string dir, string fileName, byte[] data)
     {
-        try { string p = Path.Combine(dir, fileName); File.WriteAllBytes(p, data); return p; }
+        try
+        {
+            string p = Path.Combine(dir, fileName);
+            using (FileStream fs = new FileStream(p, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            {
+                fs.Write(data, 0, data.Length);
+            }
+            return p;
+        }
         catch { return null; }
     }
 
@@ -191,11 +152,7 @@ static class Program
 
     static void Fail(string message)
     {
-#if LAUNCHER
-        System.Windows.Forms.MessageBox.Show(message, "Shelly", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-#else
         Console.Error.WriteLine(message);
-#endif
     }
 
     [STAThread]
@@ -206,33 +163,20 @@ static class Program
         string baseName = Path.GetFileNameWithoutExtension(exePath);
         byte[] data = Convert.FromBase64String(ScriptData);
         int pid = Process.GetCurrentProcess().Id;
-#if LAUNCHER
-        tempPath = WriteScript(Path.GetTempPath(), "Shelly-" + pid + ".ps1", data);
-#else
+        string token = pid + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
         // The script copy is placed next to the exe, so $PSScriptRoot points to the exe folder
-        tempPath = WriteScript(exeDir, "." + baseName + "-" + pid + ".ps1", data);
-        if (tempPath == null) tempPath = WriteScript(Path.GetTempPath(), baseName + "-" + pid + ".ps1", data);
-#endif
+        tempPath = WriteScript(exeDir, "." + baseName + "-" + token + ".ps1", data);
+        if (tempPath == null) tempPath = WriteScript(Path.GetTempPath(), baseName + "-" + token + ".ps1", data);
         if (tempPath == null) { Fail(MsgTempFail); return 1; }
 
         StringBuilder cmd = new StringBuilder("-NoProfile -ExecutionPolicy Bypass ");
-#if LAUNCHER
-        cmd.Append("-STA -WindowStyle Hidden ");
-#endif
         cmd.Append("-File ").Append(Quote(tempPath));
         foreach (string a in args) cmd.Append(' ').Append(Quote(a));
 
         ProcessStartInfo psi = new ProcessStartInfo(PowerShellExe(), cmd.ToString());
         psi.UseShellExecute = false;
-#if LAUNCHER
-        psi.CreateNoWindow = true;
-        psi.WorkingDirectory = exeDir;
-        psi.EnvironmentVariables["LAUNCHER_HOME"] = exeDir;
-        psi.EnvironmentVariables["SHELLY_APP"] = exePath;
-#else
         ctrlHandler = new ConsoleCtrlHandler(OnCtrl);
         SetConsoleCtrlHandler(ctrlHandler, true);
-#endif
         int code = 1;
         try
         {
@@ -240,7 +184,6 @@ static class Program
         }
         catch (Exception e) { Fail(MsgPsFail + e.Message); }
         Cleanup();
-#if !LAUNCHER
         // If the console window was opened just for this exe (double-click), keep it open
         try
         {
@@ -252,7 +195,6 @@ static class Program
             }
         }
         catch { }
-#endif
         return code;
     }
 }

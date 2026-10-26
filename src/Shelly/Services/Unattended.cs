@@ -168,12 +168,13 @@ public static class Unattended
             try { if (proc != null) c = proc.ExitCode; } catch (Exception ex) { AppLog.Write("Exit code not read: " + ex.Message); }
             e.Code = c; e.Kind = RunKinds.Closed;
         }
-        string cleaned = TranscriptCleaner.ReadLogFile(logFile);
+        string cleaned = TranscriptCleaner.ReadRawLogFile(logFile);
         if (cleaned.Length > 0)
         {
-            var (capped, trunc) = TranscriptCleaner.Cap(cleaned, st.Settings.HistoryOutputChars, Loc.F("outSkipped", "…"));
-            e.Truncated = trunc;
-            st.History.SaveOutput(e, capped);
+            var (capped, trunc) = TranscriptCleaner.Cap(cleaned, st.Settings.HistoryOutputKBValue, Loc.F("outSkipped", "…"));
+            if (capped.Length > 0) { e.Truncated = trunc; st.History.SaveOutput(e, capped); }
+
+
         }
         try { System.IO.File.Delete(doneFile); } catch (Exception ex) { AppLog.Write("Run marker not deleted: " + ex.Message); }
         try { if (System.IO.File.Exists(logFile)) System.IO.File.Delete(logFile); } catch (Exception ex) { AppLog.Write("Run log not deleted: " + ex.Message); }

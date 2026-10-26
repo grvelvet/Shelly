@@ -17,6 +17,8 @@ build/*
 
 # Personal settings: favorites, language, trusted scripts, presets, window layout
 launcher-settings.json
+launcher-settings.json.bak
+patch/
 
 # Run history and saved output of runs
 launcher-history/

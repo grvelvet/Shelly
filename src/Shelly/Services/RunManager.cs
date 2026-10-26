@@ -512,12 +512,13 @@ public sealed class RunManager
     void SaveWindowLog(RunSession s)
     {
         if (s.LogFile == null) return;
-        string cleaned = TranscriptCleaner.ReadLogFile(s.LogFile);
+        string cleaned = TranscriptCleaner.ReadRawLogFile(s.LogFile);
         try { if (File.Exists(s.LogFile)) File.Delete(s.LogFile); } catch (Exception ex) { AppLog.Write("Run log not deleted: " + ex.Message); }
         if (cleaned.Length == 0) cleaned = s.WindowOutput;
         if (cleaned.Length > 0)
         {
-            var (capped, trunc) = TranscriptCleaner.Cap(cleaned, state.Settings.HistoryOutputChars, Loc.F("outSkipped", "…"));
+            var (capped, trunc) = TranscriptCleaner.Cap(cleaned, state.Settings.HistoryOutputKBValue, Loc.F("outSkipped", "…"));
+            if (capped.Length == 0) return;
             s.Entry.Truncated = trunc;
             state.History.SaveOutput(s.Entry, capped);
         }

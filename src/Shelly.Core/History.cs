@@ -125,7 +125,11 @@ public sealed class HistoryStore
     /// <summary>Reads the list; runs still running when Shelly quit become interrupted (inline) or started (window).</summary>
     public void Load()
     {
-        Entries.Clear();
+        lock (Entries)
+        {
+            Entries.Clear();
+            removed.Clear();
+        }
         RecoveredTo = null;
         bool changed = false, broken = false, unreadable = false;
         if (File.Exists(IndexPath))
@@ -135,13 +139,16 @@ public sealed class HistoryStore
                 using var doc = JsonDocument.Parse(File.ReadAllText(IndexPath).TrimStart('\uFEFF'), new JsonDocumentOptions { AllowTrailingCommas = true });
                 var seen = new HashSet<string>();
                 IEnumerable<JsonElement> items = doc.RootElement.ValueKind == JsonValueKind.Array ? doc.RootElement.EnumerateArray() : Array.Empty<JsonElement>();
-                foreach (var x in items)
+                lock (Entries)
                 {
-                    var e = FromJson(x);
-                    if (e == null || !seen.Add(e.Id)) continue;
-                    if (e.Kind == "running") { e.Kind = e.Mode == "inline" ? "interrupted" : "started"; changed = true; }
-                    if (e.HasOutput && !File.Exists(OutputPath(e.Id))) e.HasOutput = false;
-                    Entries.Add(e);
+                    foreach (var x in items)
+                    {
+                        var e = FromJson(x);
+                        if (e == null || !seen.Add(e.Id)) continue;
+                        if (e.Kind == "running") { e.Kind = e.Mode == "inline" ? "interrupted" : "started"; changed = true; }
+                        if (e.HasOutput && !File.Exists(OutputPath(e.Id))) e.HasOutput = false;
+                        Entries.Add(e);
+                    }
                 }
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { unreadable = true; }   // locked or no access: nothing is touched
@@ -152,9 +159,12 @@ public sealed class HistoryStore
             }
         }
         indexUnreadable = unreadable;
-        var sorted = Entries.OrderByDescending(e => e.Start).ToList();
-        Entries.Clear();
-        Entries.AddRange(sorted);
+        lock (Entries)
+        {
+            var sorted = Entries.OrderByDescending(e => e.Start).ToList();
+            Entries.Clear();
+            Entries.AddRange(sorted);
+        }
         if (unreadable) { LastError = "history.json could not be read"; return; }
         if (broken)
         {
@@ -236,21 +246,26 @@ public sealed class HistoryStore
     /// <summary>Keeps the newest Max finished entries; returns the removed ones.</summary>
     public List<RunEntry> Limit()
     {
-        int keep = 0;
         var drop = new List<RunEntry>();
-        foreach (var e in Entries)
+        lock (Entries)
         {
-            if (e.Kind == "running") continue;
-            if (++keep > Max) drop.Add(e);
+            int keep = 0;
+            foreach (var e in Entries)
+            {
+                if (e.Kind == "running") continue;
+                if (++keep > Max) drop.Add(e);
+            }
+            foreach (var e in drop) { Entries.Remove(e); removed.Add(e.Id); }
         }
-        foreach (var e in drop) { RemoveFiles(e); Entries.Remove(e); removed.Add(e.Id); }
+        foreach (var e in drop) RemoveFiles(e);
         return drop;
     }
 
     public void RemoveOrphanOutputs()
     {
         if (!Directory.Exists(Dir)) return;
-        var ids = new HashSet<string>(Entries.Select(e => e.Id));
+        HashSet<string> ids;
+        lock (Entries) ids = new HashSet<string>(Entries.Select(e => e.Id));
         foreach (var f in Directory.EnumerateFiles(Dir, "*.log"))
             if (!ids.Contains(Path.GetFileNameWithoutExtension(f))) { try { File.Delete(f); } catch { } }
     }
@@ -259,7 +274,7 @@ public sealed class HistoryStore
 
     public List<RunEntry> Add(RunEntry e)
     {
-        Entries.Insert(0, e);
+        lock (Entries) Entries.Insert(0, e);
         var dropped = Limit();
         Save();
         return dropped;
@@ -269,8 +284,11 @@ public sealed class HistoryStore
     {
         if (e.Kind == "running") return false;
         RemoveFiles(e);
-        Entries.Remove(e);
-        removed.Add(e.Id);
+        lock (Entries)
+        {
+            Entries.Remove(e);
+            removed.Add(e.Id);
+        }
         Save();
         return true;
     }
@@ -278,8 +296,13 @@ public sealed class HistoryStore
     /// <summary>Deletes all finished runs; returns how many.</summary>
     public int Clear()
     {
-        var done = Entries.Where(e => e.Kind != "running").ToList();
-        foreach (var e in done) { RemoveFiles(e); Entries.Remove(e); removed.Add(e.Id); }
+        List<RunEntry> done;
+        lock (Entries)
+        {
+            done = Entries.Where(e => e.Kind != "running").ToList();
+            foreach (var e in done) { Entries.Remove(e); removed.Add(e.Id); }
+        }
+        foreach (var e in done) RemoveFiles(e);
         RemoveOrphanOutputs();
         Save();
         return done.Count;
@@ -290,7 +313,7 @@ public sealed class HistoryStore
         try
         {
             Directory.CreateDirectory(Dir);
-            File.WriteAllText(OutputPath(e.Id), text, new UTF8Encoding(true));
+            AtomicFile.WriteAllText(OutputPath(e.Id), text, new UTF8Encoding(true));
             e.HasOutput = true;
         }
         catch (Exception ex) { e.HasOutput = false; LastError = ex.Message; }
@@ -302,17 +325,20 @@ public sealed class HistoryStore
         try { return File.ReadAllText(OutputPath(e.Id)); } catch { return ""; }
     }
 
-    public RunEntry? Get(string id) => Entries.FirstOrDefault(e => e.Id == id);
-    public RunEntry? LastOf(string rel) => Entries.FirstOrDefault(e => string.Equals(e.Rel, rel, StringComparison.OrdinalIgnoreCase));
+    public RunEntry? Get(string id) { lock (Entries) return Entries.FirstOrDefault(e => e.Id == id); }
+    public RunEntry? LastOf(string rel) { lock (Entries) return Entries.FirstOrDefault(e => string.Equals(e.Rel, rel, StringComparison.OrdinalIgnoreCase)); }
 
     /// <summary>A script (or a folder: prefix ending with \) was renamed: its entries follow.</summary>
     public int MoveRel(string oldRel, string newRel)
     {
         int n = 0;
-        foreach (var e in Entries)
+        lock (Entries)
         {
-            if (string.Equals(e.Rel, oldRel, StringComparison.OrdinalIgnoreCase)) { e.Rel = newRel; e.Name = Path.GetFileNameWithoutExtension(newRel.Replace('\\', '/')); n++; }
-            else if (oldRel.EndsWith("\\") && e.Rel.StartsWith(oldRel, StringComparison.OrdinalIgnoreCase)) { e.Rel = newRel + e.Rel.Substring(oldRel.Length); n++; }
+            foreach (var e in Entries)
+            {
+                if (string.Equals(e.Rel, oldRel, StringComparison.OrdinalIgnoreCase)) { e.Rel = newRel; e.Name = Path.GetFileNameWithoutExtension(newRel.Replace('\\', '/')); n++; }
+                else if (oldRel.EndsWith("\\") && e.Rel.StartsWith(oldRel, StringComparison.OrdinalIgnoreCase)) { e.Rel = newRel + e.Rel.Substring(oldRel.Length); n++; }
+            }
         }
         if (n > 0) Save();
         return n;

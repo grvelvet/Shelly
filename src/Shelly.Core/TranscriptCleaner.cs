@@ -100,7 +100,7 @@ public static class TranscriptCleaner
     public static string Cap(string cleaned, int maxKB)
     {
         if (string.IsNullOrEmpty(cleaned) || maxKB <= 0) return cleaned ?? "";
-        int maxChars = maxKB * 1024;
+        int maxChars = (int)Math.Min((long)maxKB * 1024L, int.MaxValue / 2);
         if (cleaned.Length <= maxChars) return cleaned;
         string tail = cleaned[^maxChars..];
         int nl = tail.IndexOf('\n');
@@ -112,7 +112,7 @@ public static class TranscriptCleaner
     {
         string cleaned = Clean(raw);
         if (string.IsNullOrEmpty(cleaned) || maxKB <= 0) return (cleaned, false);
-        int maxChars = maxKB * 1024;
+        int maxChars = (int)Math.Min((long)maxKB * 1024L, int.MaxValue / 2);
         if (cleaned.Length <= maxChars) return (cleaned, false);
         string capped = cleaned[..maxChars];
         if (!string.IsNullOrEmpty(truncatedNote))
@@ -120,20 +120,27 @@ public static class TranscriptCleaner
         return (capped, true);
     }
 
-    /// <summary>Reads a transcript file that may still be open by PowerShell (<see cref="FileShare.ReadWrite"/>), cleans and caps it.</summary>
-    public static string ReadLogFile(string? logPath, int maxKB = 64)
+    /// <summary>Reads the raw contents of a transcript file that may still be open by PowerShell (<see cref="FileShare.ReadWrite"/>).</summary>
+    public static string ReadRawLogFile(string? logPath)
     {
         if (string.IsNullOrEmpty(logPath) || !File.Exists(logPath)) return "";
         try
         {
             using var fs = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var sr = new StreamReader(fs, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-            string raw = sr.ReadToEnd();
-            return Cap(Clean(raw), maxKB);
+            return sr.ReadToEnd();
         }
         catch
         {
             return "";
         }
+    }
+
+    /// <summary>Reads a transcript file that may still be open by PowerShell (<see cref="FileShare.ReadWrite"/>), cleans and caps it.</summary>
+    public static string ReadLogFile(string? logPath, int maxKB = 64)
+    {
+        string raw = ReadRawLogFile(logPath);
+        if (raw.Length == 0) return "";
+        return Cap(Clean(raw), maxKB);
     }
 }

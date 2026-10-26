@@ -138,7 +138,7 @@ public static class ExternalEditors
         return null;
     }
 
-    public static string Quote(string path) => "\"" + (path ?? "").Replace("\"", "\\\"") + "\"";
+    public static string Quote(string path) => Quoting.NativeArg(path ?? "");
 
     public static string FormatVsCodeArgs(string scriptPath, int line = 0) =>
         line > 0

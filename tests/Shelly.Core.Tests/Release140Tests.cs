@@ -345,4 +345,39 @@ exit /b 0
             Loc.SetLanguage(oldLang);
         }
     }
+
+    // ---------- 6. Release 1.4.2 fixes & hardening ----------
+
+    [Fact]
+    public void Release_142_TranscriptCleaner_handles_large_logs_and_20480KB_without_overflow()
+    {
+        var s = new Settings { HistoryOutputKB = "20480" };
+        Assert.Equal(20480, s.HistoryOutputKBValue);
+        Assert.Equal(20480 * 1024, s.HistoryOutputChars);
+
+        // Even if a huge maxKB is passed, Cap never overflows Int32 or throws ArgumentOutOfRangeException
+        var (capped, trunc) = TranscriptCleaner.Cap("Hello world", 20_971_520, "[truncated]");
+        Assert.Equal("Hello world", capped);
+        Assert.False(trunc);
+
+        // ReadRawLogFile reads >64 KB without premature tail truncation
+        string dir = TestUtil.TempDir();
+        string logPath = Path.Combine(dir, "window-run.log");
+        string bigBody = string.Join(Environment.NewLine, Enumerable.Range(1, 5000).Select(i => $"Line {i:D4}: " + new string('x', 20)));
+        File.WriteAllText(logPath, $"{TranscriptCleaner.Separator}\r\nPowerShell transcript start\r\nStart time: 20261026\r\n{TranscriptCleaner.Separator}\r\n{bigBody}\r\n{TranscriptCleaner.Separator}\r\nPowerShell transcript end\r\nEnd time: 20261026\r\n{TranscriptCleaner.Separator}\r\n");
+
+        string raw = TranscriptCleaner.ReadRawLogFile(logPath);
+        var (fullOut, fullTrunc) = TranscriptCleaner.Cap(raw, 1024, "[skipped]");
+        Assert.False(fullTrunc);
+        Assert.StartsWith("Line 0001:", fullOut);
+        Assert.EndsWith("Line 5000: " + new string('x', 20), fullOut);
+
+        // ExternalEditors.Quote uses CommandLineToArgvW rules (trailing backslash before quote is doubled)
+        Assert.Equal("\"C:\\Scripts\\ trailing\\\\\"", ExternalEditors.Quote(@"C:\Scripts\ trailing\"));
+
+        // ExeStub uses FileMode.CreateNew and contains no legacy #if LAUNCHER blocks
+        string stub = ExeBuilder.StubTemplate;
+        Assert.DoesNotContain("#if LAUNCHER", stub);
+        Assert.Contains("FileMode.CreateNew", stub);
+    }
 }

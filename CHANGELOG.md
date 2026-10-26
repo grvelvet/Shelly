@@ -8,6 +8,30 @@ Versions 0.9.x were the PowerShell + WPF edition; 1.0.0 and later are the .NET e
 
 ## [Unreleased]
 
+## [1.4.2] - 2026-10-26
+
+### Fixed
+
+- **Window run output capture & size limit (`TranscriptCleaner`, `RunManager`, `Unattended`, `Settings`):**
+  - Fixed completed window runs being prematurely truncated to the last 64 KB by `TranscriptCleaner.ReadLogFile` before
+    applying the user's `historyOutputKB` limit; full transcript logs are now read via `TranscriptCleaner.ReadRawLogFile`.
+  - Fixed passing `Settings.HistoryOutputChars` (already multiplied by `1024`) into `TranscriptCleaner.Cap`'s `maxKB`
+    parameter, which multiplied by `1024` a second time and overflowed `Int32` (`ArgumentOutOfRangeException`) when
+    `historyOutputKB` was set to `20480` (20 MB). Added `Settings.HistoryOutputKBValue` and clamped `maxKB * 1024L` in
+    `TranscriptCleaner.Cap`.
+- **Custom script syntax highlighting theme switching (`EditorWindow`):** cached built-in AvalonEdit syntax definitions
+  (`GetDefinitionByExtension`) now preserve their original light-theme foreground brushes in `OriginalGenericBrushes`
+  so switching from Dark theme back to Light theme restores light colors instead of keeping mutated dark brushes.
+- **External editor command-line quoting & process launch (`ExternalEditors`, `ShellOps`):** `ExternalEditors.Quote` now
+  delegates to `Quoting.NativeArg` (`CommandLineToArgvW` backslash/quote rules), and `ShellOps.ExternalEditor` starts
+  resolved editor executables with `UseShellExecute = false`.
+- **Built `.exe` wrapper hardening & cleanup (`ExeStub.cs.txt`):** temporary `.ps1` extraction now uses a per-run random
+  GUID suffix with `FileMode.CreateNew` and `FileShare.None`, and legacy `#if LAUNCHER` blocks from the pre-.NET edition
+  were removed.
+- **History store thread-safety & atomic output writes (`HistoryStore`):** synchronized all reads and mutations of
+  `Entries` and `removed` (`Add`, `Remove`, `Clear`, `Limit`, `RemoveOrphanOutputs`, `Get`, `LastOf`, `MoveRel`) under
+  `lock (Entries)` and switched `SaveOutput` to `AtomicFile.WriteAllText`.
+
 ## [1.4.1] - 2026-10-24
 
 ### Changed

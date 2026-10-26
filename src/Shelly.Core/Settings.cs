@@ -120,7 +120,8 @@ public sealed class Settings
     public static readonly string[] AccentChoices = { "#0067C0", "#2D7D9A", "#107C10", "#8764B8", "#C239B3", "#E3008C", "#CA5010", "#C42B1C", "#68768A" };
 
     public int HistoryMaxValue => int.TryParse(HistoryMax, out var n) ? Math.Max(1, n) : 100;
-    public int HistoryOutputChars => (int.TryParse(HistoryOutputKB, out var n) ? Math.Max(16, n) : 1024) * 1024;
+    public int HistoryOutputKBValue => int.TryParse(HistoryOutputKB, out var n) ? Math.Clamp(n, 16, 65536) : 1024;
+    public int HistoryOutputChars => HistoryOutputKBValue * 1024;
     public int ToastAfterSeconds => int.TryParse(ToastAfterSec, out var n) ? Math.Clamp(n, 0, 3600) : 20;
 
     // ---------- Load ----------

@@ -56,7 +56,7 @@ public static class ShellOps
             var cmd = ExternalEditors.Resolve(st.Settings, path, line, pythonExe: st.Python?.Path);
             if (cmd.UsedIseFallback)
                 App.Status(Loc.F("edIseFallback", cmd.DisplayName));
-            Process.Start(new ProcessStartInfo(cmd.ExePath, cmd.Arguments) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(cmd.ExePath, cmd.Arguments) { UseShellExecute = false });
         }
         catch (Exception ex) { App.Status(Loc.F("openFail", ex.Message), true); }
     }
