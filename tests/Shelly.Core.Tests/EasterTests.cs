@@ -118,7 +118,7 @@ public class EasterTests
         var u = new Uri(Links.Donate);
         Assert.Equal(("https", "boosty.to", "/koms"), (u.Scheme, u.Host, u.AbsolutePath));
         // The URL lives only in Core: the app code uses the constant
-        foreach (var f in new[] { new[] { "src", "Shelly", "Views", "SettingsPage.cs" }, new[] { "src", "Shelly", "Views", "MascotEgg.cs" } })
+        foreach (var f in new[] { new[] { "src", "Shelly", "Views", "MascotEgg.cs" } })
         {
             string src = File.ReadAllText(Repo(f));
             Assert.Contains("ShellOps.Open(Links.Donate)", src);

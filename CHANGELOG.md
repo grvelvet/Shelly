@@ -8,6 +8,20 @@ Versions 0.9.x were the PowerShell + WPF edition; 1.0.0 and later are the .NET e
 
 ## [Unreleased]
 
+## [1.4.3] - 2026-10-29
+
+### Changed
+
+- **Drag & Drop external folders (`MainWindow`, `ScriptActions`, `SettingsPage`):** dropping a folder anywhere onto the main Shelly window now connects it directly as an external folder (`ExternalFolders`) instead of importing a copy into `Scripts\`.
+- **Group header layout (`ExternalScripts`, `ScriptsPage.xaml`):** removed the `(added folder)` suffix from external folder group titles (leaving only the `\uE71B` link icon) and tightened the gap between the group icon and title to `6 px`.
+- **Settings → About (`SettingsPage.cs`):** simplified the About card to display `"Shelly <version>"` as a direct link to the GitHub repository above the `Created by grvelvet © 2026 • All rights reserved` caption.
+- **Local build script (`build.ps1`, `build.bat`, `Directory.Build.props`):** `build.bat` (`build.ps1 local`) now builds and copies both `Shelly.exe` (framework-dependent) and `Shelly-selfcontained.exe` (self-contained) to the repository root, and adds `NU1900` to `WarningsNotAsErrors` so offline NuGet audit checks do not fail the build.
+
+### Fixed
+
+- **Collapsed output panel strip (`OutputView.cs`, `ScriptsPage.xaml.cs`):** hid the output body container (`OutputView.SetCollapsed`) and `Splitter` when the console is collapsed (`OutputRow.Height = GridLength.Auto`), removing the narrow bordered strip under the header.
+- **`ComboBox` in-place expansion, rounding & screen-bounds validation (`Styles.xaml`, `ScrollGutter.cs`, `Motion.cs`, `ThemeManager.cs`):** removed the `Motion.ApplyResources` `ComboBox` override that shadowed `Styles.xaml`, added `ComboPopup` to unfold the dropdown directly over the button with width/height/work-area clamping, and hid the underlying button while open so its border corners never show behind the rounded popup.
+
 ## [1.4.2] - 2026-10-26
 
 ### Fixed

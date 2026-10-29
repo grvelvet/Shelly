@@ -56,6 +56,22 @@ public partial class MainWindow : Window
         SizeChanged += (_, e) => { if (e.WidthChanged) ApplyNav(false); };
         PreviewKeyDown += OnKey;
         Closing += OnClosing;
+        // Drag and drop anywhere on the window: script files are copied to Scripts; folders are connected as external folders
+        AllowDrop = true;
+        PreviewDragEnter += OnDragFiles;
+        PreviewDragOver += OnDragFiles;
+        DragLeave += (_, _) => DropOverlay.Visibility = Visibility.Collapsed;
+        PreviewDrop += (_, e) =>
+        {
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
+            DropOverlay.Visibility = Visibility.Collapsed;
+            if (e.Data.GetData(DataFormats.FileDrop) is string[] files)
+            {
+                Navigate("scripts");
+                ScriptActions.AddFiles(files);
+            }
+            e.Handled = true;
+        };
         Loc.LanguageChanged += () => { UpdateRunning(); MenuBtn.ToolTip = Loc.T(paneTarget >= Layout.PaneOpen ? "navClose" : "navOpen"); };
         // Minimized: the elapsed-time tickers stop (hidden to the tray is covered by IsVisible on the pages)
         StateChanged += (_, _) => { Scripts.UpdateTimer(); Favorites.UpdateTimer(); };
@@ -67,6 +83,14 @@ public partial class MainWindow : Window
     // Narrow window (< 800): always compact; the menu button opens the pane over the content with a shadow, and an
     // outside click, Esc or picking a page closes it. The pane's own width animates (decelerate, 250 ms); the content
     // margin changes once (at the start of a close, at the end of an open), so the page is not relaid out per frame.
+
+    void OnDragFiles(object sender, DragEventArgs e)
+    {
+        bool files = e.Data.GetDataPresent(DataFormats.FileDrop);
+        e.Effects = files ? DragDropEffects.Copy : DragDropEffects.None;
+        DropOverlay.Visibility = files ? Visibility.Visible : Visibility.Collapsed;
+        e.Handled = true;
+    }
 
     bool overlayOpen;
     double paneTarget = -1;

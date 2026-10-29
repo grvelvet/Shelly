@@ -414,47 +414,26 @@ public sealed class SettingsPage : UserControl, IPage
         Section(Loc.T("setUpdates"));
         Card(Glyphs.Update, Loc.T("setUpdateCheck"), Loc.T("setUpdateNote"), Toggle(s.UpdateCheck, on => { s.UpdateCheck = on; St.SaveSettings(); }));
 
-        // About: version, repo link, and log
+        // About: version (repo link) and copyright
         Section(Loc.T("setAbout"));
-        var links = new WrapPanel();
-        if (UpdateChecker.IsRepoSet(AppState.Repo))
+        var about = Card("\uE946", "Shelly " + AppState.Version, "Created by grvelvet \u00A9 2026 \u2022 All rights reserved", null);
+        if (about.Child is Grid ag)
         {
-            var repoH = new Hyperlink(new Run("github.com/" + AppState.Repo)) { TextDecorations = null };
-            repoH.Click += (_, _) => ShellOps.Open("https://github.com/" + AppState.Repo);
-            var repoIcon = new TextBlock { Text = Glyphs.Globe, FontSize = 15, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 4, 0) };
-            repoIcon.SetResourceReference(TextBlock.FontFamilyProperty, "IconFont");
-            var repoText = new TextBlock(repoH) { VerticalAlignment = VerticalAlignment.Center };
-            var repoRow = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 16, 0), VerticalAlignment = VerticalAlignment.Center, ToolTip = Loc.T("aboutRepoTip") };
-            repoRow.Children.Add(repoIcon);
-            repoRow.Children.Add(repoText);
-            links.Children.Add(repoRow);
-        }
-        // Support the project (Boosty): a link like the GitHub one, no pop-ups
-        {
-            var supH = new Hyperlink(new Run(Loc.T("aboutSupport"))) { TextDecorations = null };
-            supH.Click += (_, _) => ShellOps.Open(Links.Donate);
-            var supIcon = new TextBlock { Text = "\uEB51", FontSize = 15, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 4, 0) };
-            supIcon.SetResourceReference(TextBlock.FontFamilyProperty, "IconFont");
-            var supRow = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 16, 0), VerticalAlignment = VerticalAlignment.Center, ToolTip = Links.DonateShort };
-            supRow.Children.Add(supIcon);
-            supRow.Children.Add(new TextBlock(supH) { VerticalAlignment = VerticalAlignment.Center });
-            System.Windows.Automation.AutomationProperties.SetName(supRow, Loc.T("aboutSupport"));
-            links.Children.Add(supRow);
-        }
-        if (AppLog.FilePath != null)
-        {
-            var logH = new Hyperlink(new Run(Loc.T("logTitle"))) { TextDecorations = null };
-            logH.Click += (_, _) => { if (File.Exists(AppLog.FilePath)) ShellOps.Open(AppLog.FilePath); };
-            links.Children.Add(new TextBlock(logH) { Margin = new Thickness(0, 0, 16, 0), VerticalAlignment = VerticalAlignment.Center });
-        }
-        var about = Card("\uE946", "Shelly " + AppState.Version,
-            Loc.F("setAboutHost", Environment.Version.ToString(3), SystemInfo.WindowsBuild),
-            links);
-        // The icon of this card hides a small secret (three quick clicks)
-        if (about.Child is Grid ag && ag.Children.Count > 0 && ag.Children[0] is TextBlock aboutIcon)
-        {
-            aboutIcon.Background = Brushes.Transparent;   // the whole icon cell takes clicks, not only the glyph strokes
-            MascotEgg.Attach(aboutIcon);
+            if (UpdateChecker.IsRepoSet(AppState.Repo) && ag.Children.OfType<StackPanel>().FirstOrDefault() is { } sp && sp.Children.Count > 0 && sp.Children[0] is TextBlock titleTb)
+            {
+                titleTb.Text = "";
+                var repoH = new Hyperlink(new Run("Shelly " + AppState.Version)) { TextDecorations = null };
+                repoH.SetResourceReference(TextElement.ForegroundProperty, "TextFillColorPrimaryBrush");
+                repoH.Click += (_, _) => ShellOps.Open("https://github.com/" + AppState.Repo);
+                titleTb.Inlines.Add(repoH);
+                titleTb.ToolTip = Loc.T("aboutRepoTip");
+            }
+            // The icon of this card hides a small secret (three quick clicks)
+            if (ag.Children.Count > 0 && ag.Children[0] is TextBlock aboutIcon)
+            {
+                aboutIcon.Background = Brushes.Transparent;   // the whole icon cell takes clicks, not only the glyph strokes
+                MascotEgg.Attach(aboutIcon);
+            }
         }
     }
 
@@ -570,6 +549,7 @@ public sealed class SettingsPage : UserControl, IPage
         }
         s.ExternalFolders.Add(full);
         St.ExternalFoldersChanged();
+        St.NotifySettingsChanged();
         App.Status(Loc.F("extAdded", full));
         return true;
     }
@@ -581,6 +561,7 @@ public sealed class SettingsPage : UserControl, IPage
         s.DropFolder(ExternalScripts.RootKey(path));
         St.ReloadLastRuns();
         St.ExternalFoldersChanged();
+        St.NotifySettingsChanged();
         JumpLists.Update();
         App.Status(Loc.F("extRemoved", path));
         Build();

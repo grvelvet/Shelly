@@ -259,7 +259,7 @@ public class ExternalFolderTests
         Assert.Equal(new[] { ext, other }, groups.Select(g => g.Root));
         Assert.All(groups, g => Assert.Contains(g.Root, g.Title));   // same folder name twice: the full path tells them apart
         var single = ExternalScripts.Groups(new[] { ext });
-        Assert.Equal(Loc.F("extGroup", "reports"), single[0].Title);
+        Assert.Equal("reports", single[0].Title);
         var list = ScriptGrouping.Build(scripts, folders, Array.Empty<ScriptFile>(), new HashSet<string>(), "fav", "root", null, single.ToDictionary(g => g.Key, g => g.Title));
         Assert.Equal(single[0].Title, list.Single(e => e.IsGroup && e.Key == key).Title);
         Assert.Equal("Sub", list.Single(e => e.IsGroup && e.Key == key + "\\Sub").Title);
@@ -283,6 +283,40 @@ public class ExternalFolderTests
                 Assert.NotEqual(k, ru);
                 Assert.NotEqual(en, ru);
             }
+        }
+        finally { Loc.Language = "en"; }
+    }
+
+    static string RepoFile(params string[] parts)
+    {
+        for (var d = new DirectoryInfo(AppContext.BaseDirectory); d != null; d = d.Parent)
+        {
+            string p = Path.Combine(new[] { d.FullName }.Concat(parts).ToArray());
+            if (File.Exists(p)) return File.ReadAllText(p);
+        }
+        throw new FileNotFoundException(string.Join("/", parts));
+    }
+
+    [Fact]
+    public void Dropped_folder_on_main_window_connects_as_external_folder()
+    {
+        string mainXaml = RepoFile("src", "Shelly", "Views", "MainWindow.xaml");
+        string mainCs = RepoFile("src", "Shelly", "Views", "MainWindow.xaml.cs");
+        string actionsCs = RepoFile("src", "Shelly", "Views", "ScriptActions.cs");
+
+        Assert.Contains("x:Name=\"DropOverlay\"", mainXaml);
+        Assert.Contains("AllowDrop = true;", mainCs);
+        Assert.Contains("PreviewDragOver += OnDragFiles;", mainCs);
+        Assert.Contains("PreviewDrop +=", mainCs);
+        Assert.Contains("SettingsPage.TryAddExternalFolder(dir)", actionsCs);
+        Assert.DoesNotContain("ImportFolder(dirs[0]);", actionsCs);
+
+        try
+        {
+            Loc.Language = "en";
+            Assert.Contains("external folder", Loc.T("dropHintNote"));
+            Loc.Language = "ru";
+            Assert.Contains("подключается как внешняя", Loc.T("dropHintNote"));
         }
         finally { Loc.Language = "en"; }
     }

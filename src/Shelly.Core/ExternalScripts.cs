@@ -113,7 +113,7 @@ public static class ExternalScripts
         return roots.Select(r =>
         {
             string name = roots.Count(o => string.Equals(NameOf(o), NameOf(r), StringComparison.OrdinalIgnoreCase)) > 1 ? r : NameOf(r);
-            return new Group(RootKey(r), r, Loc.F("extGroup", name));
+            return new Group(RootKey(r), r, name);
         }).ToList();
     }
 

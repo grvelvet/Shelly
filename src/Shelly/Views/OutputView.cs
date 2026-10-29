@@ -21,6 +21,7 @@ public sealed class OutputView : UserControl
     readonly Button stopB, rerunB, copyB, saveB, clearB, openB;
     readonly ToggleButton wrapB;
     readonly TextBlock placeholder = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(24) };
+    readonly Grid body = new();
     RunEntry? entry;
     RunSession? session;
     /// <summary>Extra header content on the left (the collapse chevron of the Scripts page).</summary>
@@ -86,7 +87,7 @@ public sealed class OutputView : UserControl
         ThemeManager.Changed += ApplySelection;
         ApplySelection();
         SearchPanel.Install(ed);
-        var grid = new Grid();
+        var grid = body;
         var card = new Border { Child = ed, CornerRadius = new CornerRadius(6), BorderThickness = new Thickness(1) };
         card.SetResourceReference(Border.BackgroundProperty, "LayerFillColorDefaultBrush");
         card.SetResourceReference(Border.BorderBrushProperty, "CardStrokeColorDefaultBrush");
@@ -100,6 +101,8 @@ public sealed class OutputView : UserControl
         Loc.LanguageChanged += () => { foreach (var (el, key) in tips) el.ToolTip = Loc.T(key); Show(entry); };
         Show(null);
     }
+
+    public void SetCollapsed(bool collapsed) => body.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
 
     void ApplySelection()
     {

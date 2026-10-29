@@ -742,19 +742,23 @@
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
                         <Border x:Name="FocusRingBorder" CornerRadius="4" BorderThickness="2"
                                 BorderBrush="{DynamicResource FocusStrokeColorOuterBrush}" Visibility="Collapsed" IsHitTestVisible="False" />
-                        <Popup x:Name="PART_Popup" Placement="Bottom" VerticalOffset="2" HorizontalOffset="-12"
+                        <Popup x:Name="PART_Popup" Placement="Custom" v:ComboPopup.Enabled="True"
+                               PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                AllowsTransparency="True" Focusable="False"
                                IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
-                            <Grid Margin="12,4,12,16" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
-                                  MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                <Border CornerRadius="8" Background="{DynamicResource FlyoutBackground}">
+                            <Grid Margin="12,8,12,16">
+                                <Border x:Name="ShadowBorder" CornerRadius="8" Background="{DynamicResource FlyoutBackground}"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                     <Border.Effect>
                                         <DropShadowEffect BlurRadius="16" ShadowDepth="4" Direction="270" Opacity="0.22" Color="Black" RenderingBias="Performance" />
                                     </Border.Effect>
                                 </Border>
                                 <Border x:Name="DropDownBorder" CornerRadius="8" Background="{DynamicResource FlyoutBackground}"
-                                        BorderBrush="{DynamicResource FlyoutBorderBrush}" BorderThickness="1" Padding="4" SnapsToDevicePixels="True">
+                                        BorderBrush="{DynamicResource FlyoutBorderBrush}" BorderThickness="1" Padding="4" SnapsToDevicePixels="True"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                     <ScrollViewer CanContentScroll="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                                                   v:ScrollGutter.Enabled="True" SnapsToDevicePixels="True">
                                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
@@ -764,6 +768,10 @@
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsDropDownOpen" Value="True">
+                            <Setter TargetName="ToggleButton" Property="Opacity" Value="0" />
+                            <Setter TargetName="ContentSite" Property="Opacity" Value="0" />
+                        </Trigger>
                         <Trigger Property="v:FocusRing.Show" Value="True">
                             <Setter TargetName="FocusRingBorder" Property="Visibility" Value="Visible" />
                         </Trigger>

@@ -27,14 +27,8 @@ public static class Motion
         r[SystemParameters.MenuPopupAnimationKey] = anim;      // ContextMenu takes its popup animation from this key
         r[SystemParameters.ToolTipPopupAnimationKey] = anim;   // ToolTip likewise
         r[SystemParameters.ComboBoxPopupAnimationKey] = anim;
-        // The Fluent ComboBox style sets Popup.PopupAnimation="None"; a derived implicit style turns the fade on
+        // Styles.xaml ComboBox template binds PART_Popup.PopupAnimation to ComboBoxPopupAnimationKey directly
         r.Remove(typeof(ComboBox));
-        if (Enabled && app.TryFindResource(typeof(ComboBox)) is Style baseStyle)
-        {
-            var st = new Style(typeof(ComboBox), baseStyle);
-            st.Setters.Add(new Setter(Popup.PopupAnimationProperty, PopupAnimation.Fade));
-            r[typeof(ComboBox)] = st;
-        }
         if (!hooked)
         {
             hooked = true;

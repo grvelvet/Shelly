@@ -19,14 +19,6 @@ public partial class ScriptsPage : UserControl, IPage
     bool updateDismissed;
     static AppState St => App.S;
 
-    void OnDragFiles(object sender, DragEventArgs e)
-    {
-        bool files = e.Data.GetDataPresent(DataFormats.FileDrop);
-        e.Effects = files ? DragDropEffects.Copy : DragDropEffects.None;
-        DropOverlay.Visibility = files ? Visibility.Visible : Visibility.Collapsed;
-        e.Handled = true;
-    }
-
     sealed record Cmd(string Glyph, string Text, Action Do);
 
     public ScriptsPage()
@@ -54,18 +46,6 @@ public partial class ScriptsPage : UserControl, IPage
         };
         Empty.Secondary += () => ShellOps.OpenFolder(St.Paths.Scripts);
         FoldersBtn.Click += (_, _) => FoldersMenu().IsOpen = true;
-
-        // Drag and drop: .ps1 and .py files dropped anywhere on the page (the list and the empty state too) are copied into the Scripts folder
-        AllowDrop = List.AllowDrop = Empty.AllowDrop = true;
-        DragEnter += OnDragFiles;
-        DragOver += OnDragFiles;
-        DragLeave += (_, _) => DropOverlay.Visibility = Visibility.Collapsed;
-        Drop += (_, e) =>
-        {
-            DropOverlay.Visibility = Visibility.Collapsed;
-            if (e.Data.GetData(DataFormats.FileDrop) is string[] files) ScriptActions.AddFiles(files);
-            e.Handled = true;
-        };
 
         // Toolbar: sort, collapse / expand all, view, filter (or all four under "…" in a narrow window)
         SortBtn.Click += (_, _) => Open(SortBtn, FillSort);
@@ -149,11 +129,13 @@ public partial class ScriptsPage : UserControl, IPage
             return;
         }
         bool c = St.Settings.OutputCollapsed;
+        Output.SetCollapsed(c);
+        Splitter.Visibility = !c ? Visibility.Visible : Visibility.Collapsed;
         outToggle.Content = c ? Glyphs.ChevronUp : Glyphs.ChevronDown;
         outToggle.IsChecked = false;
         double h = double.TryParse(St.Settings.OutputHeight, out var v) ? Math.Clamp(v, 120, 1200) : 240;
-        OutputRow.Height = c ? new GridLength(44) : new GridLength(h);
-        OutputRow.MinHeight = c ? 44 : 120;
+        OutputRow.Height = c ? GridLength.Auto : new GridLength(h);
+        OutputRow.MinHeight = c ? 0 : 120;
         Splitter.IsEnabled = !c;
     }
 

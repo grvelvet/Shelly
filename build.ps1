@@ -10,7 +10,7 @@
                and artifacts\publish\sc (self-contained); -Flavor picks one
       pack     the release zips and SHA256SUMS.txt in artifacts\dist (publishes first), the same names and
                layout as the GitHub release: shelly-<version>.zip, shelly-<version>-selfcontained.zip
-      local    publish fd and copy Shelly.exe to the repository root, next to Scripts (what build.bat did)
+      local    publish fd and sc, and copy Shelly.exe and Shelly-selfcontained.exe to the repository root, next to Scripts (what build.bat does)
       clean    delete artifacts\ (and the bin\, obj\, publish\ folders of the old layout)
       all      build, test, publish, pack (the default)
 
@@ -277,12 +277,16 @@ function Invoke-Pack {
 }
 
 function Invoke-Local {
-    Invoke-Publish @('fd')
+    Invoke-Publish @('fd', 'sc')
     Step 'local'
-    $dest = P 'Shelly.exe'
-    try { Copy-Item -Force $script:Published['fd'] $dest }
-    catch { Fail "Could not replace Shelly.exe (is Shelly running? close it, also in the tray): $($_.Exception.Message)" }
-    Info 'Shelly.exe updated next to Scripts.'
+    $destFd = P 'Shelly.exe'
+    $destSc = P 'Shelly-selfcontained.exe'
+    try {
+        Copy-Item -Force $script:Published['sc'] $destSc
+        Copy-Item -Force $script:Published['fd'] $destFd
+    }
+    catch { Fail "Could not replace Shelly.exe / Shelly-selfcontained.exe (is Shelly running? close it, also in the tray): $($_.Exception.Message)" }
+    Info 'Shelly.exe and Shelly-selfcontained.exe updated next to Scripts.'
 }
 
 function Invoke-Clean {

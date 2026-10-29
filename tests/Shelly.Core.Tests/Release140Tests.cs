@@ -380,4 +380,31 @@ exit /b 0
         Assert.DoesNotContain("#if LAUNCHER", stub);
         Assert.Contains("FileMode.CreateNew", stub);
     }
+
+    [Fact]
+    public void Release_142_OutputView_collapsed_About_card_and_ComboBox_popup_rounding()
+    {
+        string outputView = RepoFile("src", "Shelly", "Views", "OutputView.cs");
+        Assert.Contains("public void SetCollapsed(bool collapsed)", outputView);
+
+        string scriptsPage = RepoFile("src", "Shelly", "Views", "ScriptsPage.xaml.cs");
+        Assert.Contains("Output.SetCollapsed(c);", scriptsPage);
+        Assert.Contains("OutputRow.Height = c ? GridLength.Auto : new GridLength(h);", scriptsPage);
+
+        string settingsPage = RepoFile("src", "Shelly", "Views", "SettingsPage.cs");
+        Assert.DoesNotContain("setAboutHost", settingsPage);
+        Assert.Contains("new Hyperlink(new Run(\"Shelly \" + AppState.Version))", settingsPage);
+        Assert.Contains("Created by grvelvet \\u00A9 2026 \\u2022 All rights reserved", settingsPage);
+        Assert.DoesNotContain("Btn(Loc.T(\"logTitle\")", settingsPage);
+        string stylesXaml = RepoFile("src", "Shelly", "Styles.xaml");
+        Assert.Contains("v:ComboPopup.Enabled=\"True\"", stylesXaml);
+        Assert.Contains("<Trigger Property=\"IsDropDownOpen\" Value=\"True\">", stylesXaml);
+
+        string motionCs = RepoFile("src", "Shelly", "Views", "Motion.cs");
+        Assert.DoesNotContain("r[typeof(ComboBox)] = st;", motionCs);
+
+        string themeCs = RepoFile("src", "Shelly", "Services", "ThemeManager.cs");
+        Assert.Contains("r[\"FlyoutBackground\"]", themeCs);
+        Assert.Contains("r[\"FlyoutBorderBrush\"]", themeCs);
+    }
 }

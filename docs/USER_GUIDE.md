@@ -98,10 +98,10 @@ Shelly\
 Besides `Scripts`, Shelly can list the scripts of any other folders on your disk (up to 20), for example one folder per
 project, each with a script that works on the files in that folder.
 
-- **Add:** **Settings → Folders and files → Additional folders → Add folder…**, then pick the folder. **Open**
+- **Add:** drop a folder onto the Shelly window, or open **Settings → Folders and files → Additional folders → Add folder…**, then pick the folder. **Open**
   shows it in Explorer, **Remove** takes it off the list (the folder and its files are not touched; the favorites, trust,
   run settings, icons and engine choice kept for its scripts are forgotten).
-- **In the list:** each folder is a group named after it with the mark "(added folder)" (the full path when two folders
+- **In the list:** each folder is a group named after it with the link icon (the full path when two folders
   have the same name), with its subfolders below. The tooltip of the group shows the folder on disk. Search, filters,
   sort, favorites, history, the tray and the jump list work for these scripts as for the others.
 - **Run in place:** nothing is copied. The script runs from its own file with its own folder as the working directory,
@@ -134,7 +134,7 @@ project, each with a script that works on the files in that folder.
 ### Importing a folder (scripts with their own files)
 
 A script that reads its own config, data or modules needs those files next to it. *Import folder…* (the `>` commands,
-the menu of the Scripts group) or dropping a folder on the Scripts page copies the whole folder into Scripts (dropped
+the menu of the Scripts group) copies the whole folder into Scripts (dropping a folder onto the Shelly window connects it as an external folder instead; dropped
 files are added as before):
 
 1. Shelly reads the folder in the background.
@@ -853,7 +853,7 @@ away.
 | | Saved output per run: 256 KB / 1 MB / 5 MB / 20 MB | 1 MB |
 | Folders and files | Scripts folder, additional folders (connected external folders) (Add folder…, Open, Remove), build folder, settings file (Open / Show) | none added |
 | Updates | Check for updates at startup | on |
-| About | Version, Check now, links to GitHub, Support the project (Boosty), the user guide (in the UI language), README, CHANGELOG, LICENSE, the disclaimer, the log | |
+| About | Program name and version (link to the GitHub repository), author and copyright (`Created by grvelvet © 2026 • All rights reserved`) | |
 
 The Scripts page also remembers the sort (`listSort`, `listSortDesc`), the view (`listView`) and the collapsed groups
 (`collapsedGroups`). The filters are not saved.

@@ -133,19 +133,29 @@ public static class ScriptActions
         AddFiles(d.FileNames);
     }
 
-    /// <summary>Files dropped on the Scripts page: the .ps1 and .py files are COPIED into the Scripts folder (never overwritten, a taken name
-    /// gets " (2)"); other files are skipped. Nothing is run; a copy keeps the Mark of the Web, so the usual unblock rule applies.</summary>
+    /// <summary>Files or folders dropped on the Shelly window: script files are COPIED into the Scripts folder (never overwritten, a taken name
+    /// gets " (2)"); a dropped folder is connected as an external script folder. Nothing is run; a copy keeps the Mark of the Web, so the usual unblock rule applies.</summary>
     public static void AddFiles(IEnumerable<string> dropped)
     {
-        // A dropped folder is imported with its files (Import folder…); the files go on as before
+        // A dropped folder is connected as an external folder; script files are copied to Scripts as before
         var all = dropped.ToList();
         var dirs = all.Where(p => { try { return Directory.Exists(p); } catch { return false; } }).ToList();
         var files = all.Except(dirs).ToList();
         if (files.Count > 0) AddFileList(files);
         if (dirs.Count > 0)
         {
-            if (dirs.Count > 1) App.Status(Loc.F("fiOneAtATime", Path.GetFileName(Path.TrimEndingDirectorySeparator(dirs[0]))));
-            ImportFolder(dirs[0]);
+            string? firstAddedDir = null;
+            foreach (var dir in dirs)
+            {
+                if (SettingsPage.TryAddExternalFolder(dir))
+                    firstAddedDir ??= ExternalScripts.Normalize(dir);
+            }
+            if (firstAddedDir != null)
+            {
+                App.Win?.Navigate("scripts");
+                var first = St.Scripts.FirstOrDefault(f => string.Equals(f.ExternalRoot, firstAddedDir, StringComparison.OrdinalIgnoreCase));
+                if (first != null) App.Win?.SelectScript(first.Rel);
+            }
         }
     }
 

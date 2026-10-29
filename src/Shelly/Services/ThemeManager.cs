@@ -22,7 +22,12 @@ public static class ThemeManager
         var app = Application.Current;
 #pragma warning disable WPF0001
         var mode = s.Theme switch { "light" => ThemeMode.Light, "dark" => ThemeMode.Dark, _ => ThemeMode.System };
-        if (app.ThemeMode != mode) app.ThemeMode = mode;
+        if (app.ThemeMode != mode)
+        {
+            app.ThemeMode = mode;
+            var styles = app.Resources.MergedDictionaries.FirstOrDefault(d => d.Source?.OriginalString.EndsWith("Styles.xaml", StringComparison.OrdinalIgnoreCase) == true);
+            if (styles != null) { app.Resources.MergedDictionaries.Remove(styles); app.Resources.MergedDictionaries.Add(styles); }
+        }
 #pragma warning restore WPF0001
         IsDark = s.Theme == "dark" || (s.Theme == "system" && SystemIsDark());
         ApplyAccent(s.Accent);
@@ -155,6 +160,8 @@ public static class ThemeManager
         // "Downloaded from the internet" (Mark of the Web): orange, apart from the yellow caution and the red danger
         r["ShellyMotwBrush"] = Frozen(IsDark ? Color.FromRgb(0xFF, 0x9A, 0x3C) : Color.FromRgb(0xC4, 0x5A, 0x00));
         r["ShellyLayerStrokeBrush"] = Frozen(IsDark ? Color.FromArgb(0x19, 0x00, 0x00, 0x00) : Color.FromArgb(0x0F, 0x00, 0x00, 0x00));
+        r["FlyoutBackground"] = Frozen(IsDark ? Color.FromRgb(0x2C, 0x2C, 0x2C) : Color.FromRgb(0xF9, 0xF9, 0xF9));
+        r["FlyoutBorderBrush"] = Frozen(IsDark ? Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x19, 0x00, 0x00, 0x00));
     }
 
     static Color Safe(Func<Color> f, Color fallback) { try { return f(); } catch { return fallback; } }

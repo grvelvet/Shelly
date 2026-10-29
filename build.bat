@@ -1,6 +1,6 @@
 @echo off
 rem Kept for double-click and old habits: build.ps1 does the work (see README, "Build from source").
-rem   build.bat            Shelly.exe next to Scripts (build.ps1 local), as before
+rem   build.bat            Shelly.exe and Shelly-selfcontained.exe next to Scripts (build.ps1 local)
 rem   build.bat test       the tests
 rem   build.bat sc / all   publish (self-contained / both) to artifacts\publish
 rem   build.bat <tasks>    anything build.ps1 takes: build.bat pack, build.bat clean all ...

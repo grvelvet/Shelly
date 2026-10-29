@@ -86,3 +86,101 @@ public static class ScrollGutter
         return null;
     }
 }
+
+/// <summary>1.4.2: Windows 11 in-place ComboBox flyout placement and bounds validation (width, height, screen position).</summary>
+public static class ComboPopup
+{
+    public static readonly DependencyProperty EnabledProperty = DependencyProperty.RegisterAttached(
+        "Enabled", typeof(bool), typeof(ComboPopup), new PropertyMetadata(false, OnEnabled));
+    public static bool GetEnabled(DependencyObject d) => (bool)d.GetValue(EnabledProperty);
+    public static void SetEnabled(DependencyObject d, bool v) => d.SetValue(EnabledProperty, v);
+
+    const double ShadowLeft = 12, ShadowTop = 8, ShadowRight = 12, ShadowBottom = 16, ScreenMargin = 8;
+
+    static void OnEnabled(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not Popup popup || !(bool)e.NewValue) return;
+        popup.Placement = PlacementMode.Custom;
+        popup.CustomPopupPlacementCallback = (popupSize, _, _) => Place(popup, popupSize);
+        popup.Opened += (_, _) => Validate(popup);
+    }
+
+    static void Validate(Popup popup)
+    {
+        if (popup.TemplatedParent is not ComboBox combo || popup.Child is not FrameworkElement root) return;
+        var work = SystemParameters.WorkArea;
+        double minW = Math.Max(0, combo.ActualWidth);
+        double maxW = Math.Max(minW, work.Width - 2 * ScreenMargin);
+        double maxH = Math.Min(combo.MaxDropDownHeight, Math.Max(120, work.Height - 2 * ScreenMargin));
+        if (combo.Template?.FindName("DropDownBorder", combo) is FrameworkElement bd)
+        {
+            bd.MinWidth = minW;
+            bd.MaxWidth = maxW;
+            bd.MaxHeight = maxH;
+        }
+        if (combo.Template?.FindName("ShadowBorder", combo) is FrameworkElement sb)
+        {
+            sb.MinWidth = minW;
+            sb.MaxWidth = maxW;
+            sb.MaxHeight = maxH;
+        }
+        root.UpdateLayout();
+        double h = popup.HorizontalOffset;
+        popup.HorizontalOffset = h + 0.01;
+        popup.HorizontalOffset = h;
+    }
+
+    static CustomPopupPlacement[] Place(Popup popup, Size popupSize)
+    {
+        var combo = popup.TemplatedParent as ComboBox ?? popup.PlacementTarget as ComboBox;
+        double scaleX = 1.0, scaleY = 1.0;
+        if (combo != null)
+        {
+            var dpi = VisualTreeHelper.GetDpi(combo);
+            if (dpi.DpiScaleX > 0) scaleX = dpi.DpiScaleX;
+            if (dpi.DpiScaleY > 0) scaleY = dpi.DpiScaleY;
+        }
+        double sLeft = ShadowLeft * scaleX, sTop = ShadowTop * scaleY;
+        double sRight = ShadowRight * scaleX, sBottom = ShadowBottom * scaleY;
+        double marginX = ScreenMargin * scaleX, marginY = ScreenMargin * scaleY;
+
+        double x = -sLeft;
+        double y = -sTop;
+
+        if (combo != null && combo.IsVisible && PresentationSource.FromVisual(combo) != null)
+        {
+            try
+            {
+                if (combo.SelectedIndex > 0 && combo.Template?.FindName("DropDownBorder", combo) is FrameworkElement bd &&
+                    combo.ItemContainerGenerator.ContainerFromIndex(combo.SelectedIndex) is FrameworkElement item &&
+                    PresentationSource.FromVisual(item) != null && PresentationSource.FromVisual(bd) != null)
+                {
+                    double itemY = item.TranslatePoint(new Point(0, 0), bd).Y * scaleY;
+                    if (itemY > 0 && itemY < popupSize.Height - sTop - sBottom)
+                        y = -sTop - itemY + 4 * scaleY;
+                }
+
+                Point screenOrigin = combo.PointToScreen(new Point(0, 0));
+                var work = SystemParameters.WorkArea;
+                double waLeft = work.Left * scaleX, waTop = work.Top * scaleY;
+                double waRight = work.Right * scaleX, waBottom = work.Bottom * scaleY;
+
+                double visW = Math.Max(0, popupSize.Width - sLeft - sRight);
+                double visH = Math.Max(0, popupSize.Height - sTop - sBottom);
+
+                double visLeft = screenOrigin.X + x + sLeft;
+                if (visLeft + visW > waRight - marginX) x -= (visLeft + visW) - (waRight - marginX);
+                visLeft = screenOrigin.X + x + sLeft;
+                if (visLeft < waLeft + marginX) x += (waLeft + marginX) - visLeft;
+
+                double visTop = screenOrigin.Y + y + sTop;
+                if (visTop + visH > waBottom - marginY) y -= (visTop + visH) - (waBottom - marginY);
+                visTop = screenOrigin.Y + y + sTop;
+                if (visTop < waTop + marginY) y += (waTop + marginY) - visTop;
+            }
+            catch (InvalidOperationException) { }
+        }
+
+        return new[] { new CustomPopupPlacement(new Point(x, y), PopupPrimaryAxis.Vertical) };
+    }
+}
