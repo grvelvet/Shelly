@@ -8,6 +8,30 @@ Versions 0.9.x were the PowerShell + WPF edition; 1.0.0 and later are the .NET e
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-06
+
+### Changed
+
+- **Script list row layout & decluttering (`ScriptsPage.xaml`, `Rows.cs`):**
+  - Moved the favorite star marker directly in front of the script title.
+  - File extensions (`.ps1`, `.py`, `.bat`, `.cmd`) are now preserved in script item titles, eliminating redundant engine tags (`PS 5.1`, `PY`, `BAT`).
+  - Replaced the verbose `[Trusted]` text badge with a color-coded security shield indicator: green for trusted scripts, red for unverified high-severity findings or Mark of the Web, and empty for clean scripts pending first execution.
+  - Removed persistent green checkmarks for successful past runs; status indicators now appear only for failures or user-stopped runs.
+- **Settings cards & Fluent Motion (`SettingsPage.cs`, `Motion.cs`, `Styles.xaml`):**
+  - Flattened the Accent color card to standard 64 px height with a clean round 28x28 system accent swatch without redundant text labels.
+  - Standardized the Schedules card to 64 px height when no schedules are active, and aligned schedule task rows to a 48 px grid.
+  - Added smooth deceleration transitions (167 ms) for `ToggleSwitch` knobs (`Motion.KnobOn`), animated chevron rotations, and smooth list expansion.
+- **Concise interface copy & WinUI 3 ContentDialog layout (`Strings.json`, `Loc.cs`, `Dlg.cs`, `SettingsPage.cs`):**
+  - Streamlined verbose descriptions, notes, and analyzer rule explanations across Russian and English localizations.
+  - Standardized all modal dialogs to WinUI 3 `ContentDialog` layout with 548 px max width, 20 px SemiBold header typography, and shaded footer button bands.
+
+### Fixed
+
+- **Persistent danger confirmation by SHA-256 hash (`Safety.cs`, `RunPolicy.cs`):** dangerous command prompts are now requested once per script content hash, re-prompting only when file modifications occur.
+- **Global safety toggle bypass (`RunPlanner.cs`, `RunPolicy.cs`):** ensured the global safety warning switch in Settings is strictly respected across all execution modes.
+- **GUI & hidden script execution flashing (`RunPlanner.cs`, `OtherScripts.cs`):** eliminated console window flicker and minimized taskbar artifacts for `gui` and `hidden` window modes.
+- **Standalone executable wrapper hardening (`ExeStub.cs.txt`):** resolved execution failures when invoking PowerShell through Microsoft Store aliases (`WindowsApps\pwsh.exe`), retained working directories on launch, and prevented instant window dismissal on startup errors.
+
 ## [1.4.3] - 2026-10-29
 
 ### Changed

@@ -13,7 +13,7 @@
        version. Assembly and file versions are always the plain number (1.4.0.0): the About box and the update check
        read the assembly version. -->
   <PropertyGroup>
-    <VersionPrefix>1.4.3</VersionPrefix>
+    <VersionPrefix>1.5.0</VersionPrefix>
     <VersionSuffix Condition="'$(ShellyRelease)' != 'true' and '$(VersionSuffix)' == ''">dev</VersionSuffix>
     <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
     <FileVersion>$(VersionPrefix).0</FileVersion>
