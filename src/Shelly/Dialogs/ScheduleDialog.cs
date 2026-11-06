@@ -109,8 +109,8 @@ public sealed class ScheduleDialog : DialogWindow
         if (!allowed) Note(Loc.T("schedAdminNo"), "SystemFillColorCriticalBrush", Glyphs.Shield);
         else
         {
-            if (Safety.Level(meta.Danger) == "high") Note(Loc.T("schedWarnDanger"), "SystemFillColorCriticalBrush", Glyphs.Error);
-            else if (Safety.Needed(St.Settings, meta.Danger, "inline", f.Rel, f.Path, f.Hash)) Note(Loc.T("schedWarnConfirm"), "SystemFillColorCautionBrush", Glyphs.Warning);
+            if (Safety.Needed(St.Settings, meta.Danger, "inline", f.Rel, f.Path, f.Hash)) Note(Loc.T(Safety.Level(meta.Danger) == "high" ? "schedWarnDanger" : "schedWarnConfirm"), Safety.Level(meta.Danger) == "high" ? "SystemFillColorCriticalBrush" : "SystemFillColorCautionBrush", Safety.Level(meta.Danger) == "high" ? Glyphs.Error : Glyphs.Warning);
+            // handled above for both high and medium findings
             if (meta.Zone is { Blocks: true }) Note(Loc.T("schedWarnMotw"), "SystemFillColorCautionBrush", Glyphs.Warning);
         }
         var info = Text(Loc.T("schedNote") + " " + Loc.T("schedWarnChange"), "TextFillColorSecondaryBrush", 12);

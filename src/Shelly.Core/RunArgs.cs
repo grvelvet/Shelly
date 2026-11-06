@@ -79,7 +79,7 @@ public static class RunArgs
     /// it, after the UAC prompt (<see cref="WindowHost.HashGuard"/>). The window stays open (-NoExit), and doneFile gets the
     /// script's exit code when it ends (1.2.0), with the same rules as inline runs. 1.3.1: the older forms without an end
     /// marker (-File, -Command without it) and the admin flag are gone; every window run has had a marker since 1.2.0.</summary>
-    public static string WindowArgs(string path, string argText, string? expectedHash, string doneFile, string? logFile = null)
+    public static string WindowArgs(string path, string argText, string? expectedHash, string doneFile, string? logFile = null, bool keepOpen = true)
     {
         string dir = System.IO.Path.GetDirectoryName(path) ?? "";
         string run = "$global:LASTEXITCODE=0; & " + Quoting.PsString(path) + argText + "; if($LASTEXITCODE){$sc=$LASTEXITCODE}";
@@ -90,7 +90,7 @@ public static class RunArgs
         string body = "Set-Location -LiteralPath " + Quoting.PsString(dir) + "; $sc=0; " + startLog +
                       "try { " + run + " } catch { $Host.UI.WriteErrorLine(($_ | Out-String).Trim()); $sc=1 } " +
                       DoneFinally(doneFile, "$sc", logFile);
-        return WindowHost.Prefix + Quoting.NativeArg(body);
+        return (keepOpen ? WindowHost.Prefix : WindowHost.HiddenPrefix) + Quoting.NativeArg(body);
     }
 
     /// <summary>The end marker of a window run: stops the transcript (when logFile is set) and writes the exit code to doneFile.</summary>

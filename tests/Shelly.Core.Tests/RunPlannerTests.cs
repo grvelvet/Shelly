@@ -280,8 +280,12 @@ public class RunPlannerTests : IDisposable
         ui = new Ui();
         Assert.Equal(PlanStatus.Ready, (await Interactive(env, ui, f)).Status);
         Assert.Empty(ui.Calls);
-        // Red findings always ask, trusted or not
+        // Red findings also respect trust for the exact content hash, and ask again when the script changes
         env.MetaOf = _ => new ScriptMeta { Danger = { Finding("high") } };
+        ui = new Ui();
+        await Interactive(env, ui, f);
+        Assert.Empty(ui.Calls);
+        f = Add(env, "d.ps1", "'y'\n");
         ui = new Ui();
         await Interactive(env, ui, f);
         Assert.Contains("safety:inline", ui.Calls);

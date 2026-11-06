@@ -153,8 +153,8 @@
                             <Setter TargetName="Track" Property="Background" Value="{DynamicResource ToggleSwitchFillOn}" />
                             <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource ToggleSwitchFillOn}" />
                             <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource ToggleSwitchKnobFillOn}" />
-                            <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
-                            <Setter TargetName="Knob" Property="Margin" Value="0,0,4,0" />
+                            <Setter TargetName="Knob" Property="v:Motion.KnobOn" Value="True" />
+
                             <Setter TargetName="Txt" Property="Text" Value="{DynamicResource ToggleOnText}" />
                         </Trigger>
                         <MultiTrigger>
@@ -175,7 +175,7 @@
                             <Setter TargetName="Track" Property="Background" Value="{DynamicResource ToggleSwitchFillOnPointerOver}" />
                             <Setter TargetName="Knob" Property="Width" Value="14" />
                             <Setter TargetName="Knob" Property="Height" Value="14" />
-                            <Setter TargetName="Knob" Property="Margin" Value="0,0,3,0" />
+                            <Setter TargetName="Knob" Property="Margin" Value="3,0,0,0" />
                         </MultiTrigger>
                         <Trigger Property="v:FocusRing.Show" Value="True">
                             <Setter TargetName="Focus" Property="Visibility" Value="Visible" />

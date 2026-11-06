@@ -6,7 +6,7 @@ namespace Shelly.Core;
 /// <summary>Which mode a run uses (1.2.0).</summary>
 public static class RunModes
 {
-    public const string Inline = "inline", Window = "window", Admin = "admin";
+    public const string Inline = "inline", Window = "window", Admin = "admin", Gui = "gui", Hidden = "hidden";
     /// <summary>The choices of Settings > Running > Default run mode ("window" is the default since 1.2.0).</summary>
     public static readonly string[] Defaults = { "window", "inline" };
     public const string DefaultMode = "window";
@@ -18,12 +18,12 @@ public static class RunModes
     /// loop, and the editor brings the output in Shelly's window to the front.</summary>
     public static string Resolve(string? requested, string origin, string? remembered, string? header, string defaultMode)
     {
-        if (requested is "inline" or "window" or "admin") return requested;
+        if (requested is "inline" or "window" or "admin" or "gui" or "hidden") return requested;
         if (origin == "editor") return "inline";
         if (origin is "list" or "jumplist")
         {
-            if (remembered is "inline" or "window" or "admin") return remembered;
-            if (header is "inline" or "window" or "admin") return header;
+            if (remembered is "inline" or "window" or "admin" or "gui" or "hidden") return remembered;
+            if (header is "inline" or "window" or "admin" or "gui" or "hidden") return header;
         }
         return defaultMode is "inline" or "window" ? defaultMode : DefaultMode;
     }

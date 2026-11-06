@@ -57,7 +57,7 @@ public sealed class ScriptRow : RowBase
     public ScriptFile File { get; private set; }
     public ScriptRow(ScriptFile f) { File = f; }
     public string Rel => File.Rel;
-    public string Name => File.Name;
+    public string Name => System.IO.Path.GetFileName(File.Path.Length > 0 ? File.Path : File.Rel);
     int depth;
     public int Depth { get => depth; set { if (Set(ref depth, value)) { On(nameof(CardMargin)); On(nameof(CompactMargin)); } } }
     /// <summary>Outer margin of the row card: nested folders indent the card under their header.</summary>
@@ -78,11 +78,11 @@ public sealed class ScriptRow : RowBase
     /// <summary>Quiet engine mark ("PS 5.1"), only when informative: see <see cref="EngineInfo.RowMark"/>.</summary>
     string engineMark = "";
     public string EngineMark { get => engineMark; set { if (Set(ref engineMark, value)) On(nameof(ShowEngine)); } }
-    public bool ShowEngine => EngineMark.Length > 0;
+    public bool ShowEngine => EngineMark.Length > 0 && EngineMissing;
     string engineTip = "";
     public string EngineTip { get => engineTip; set => Set(ref engineTip, value); }
     bool engineMissing;
-    public bool EngineMissing { get => engineMissing; set => Set(ref engineMissing, value); }
+    public bool EngineMissing { get => engineMissing; set { if (Set(ref engineMissing, value)) On(nameof(ShowEngine)); } }
     string lastGlyph = "";
     public string LastGlyph { get => lastGlyph; set { if (Set(ref lastGlyph, value)) On(nameof(HasLast)); } }
     public bool HasLast => LastGlyph.Length > 0;
@@ -182,7 +182,7 @@ public sealed class ScriptRow : RowBase
         if (lr != null)
         {
             var v = RunResult.LastRunView(lr);
-            LastGlyph = v.Mark; LastKind = v.Kind; LastTip = v.Tip; LastLine = v.Line;
+            LastGlyph = v.Kind == "ok" ? "" : v.Mark; LastKind = v.Kind; LastTip = v.Tip; LastLine = v.Line;
         }
         else { LastGlyph = ""; LastKind = ""; LastTip = ""; LastLine = Loc.T("detNever"); }
         // Info findings never mark the row; the slot shows the most important state
@@ -213,6 +213,23 @@ public sealed class ScriptRow : RowBase
         InProject = f.InProject;
         On(nameof(ProjectTip));
         IsTrusted = Safety.IsTrusted(st.Settings, f.Rel, f.Path, f.Hash);
+        On(nameof(Name));
+        if (IsTrusted || (lr != null && m.Zone?.Blocks != true && lvl.Length == 0))
+        {
+            Danger = "trusted";
+            DangerGlyph = "\uEA18";
+            DangerTip = tip.Count > 0 ? Loc.T("rowTrustedTip") + "\n\n" + string.Join("\n\n", tip) : Loc.T("rowTrustedTip");
+        }
+        else if (m.Zone?.Blocks == true || lvl.Length > 0)
+        {
+            Danger = "high";
+            DangerGlyph = "\uEA18";
+        }
+        else
+        {
+            Danger = "";
+            DangerGlyph = "\uEA18";
+        }
         On(nameof(TrustedLabel));
         On(nameof(TrustedTip));
         var parts = new List<string> { f.IsExternal ? f.Path : f.Rel };

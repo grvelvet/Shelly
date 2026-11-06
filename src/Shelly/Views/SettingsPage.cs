@@ -45,6 +45,10 @@ public sealed class SettingsPage : UserControl, IPage
     {
         if (showNext != null) { _shellView = showNext; showNext = null; }
         Build();
+
+
+        Dispatcher.BeginInvoke(() => { for (int i = 0; i < Math.Min(body.Children.Count, 12); i++) Motion.Enter(body.Children[i], 8, 180 + i * 15); });
+        Build();
     }
 
     static string? showNext;
@@ -109,7 +113,7 @@ public sealed class SettingsPage : UserControl, IPage
         sp.Children.Add(new TextBlock { Text = title, FontSize = 14, TextWrapping = TextWrapping.Wrap });
         if (!string.IsNullOrEmpty(desc))
         {
-            var d = new TextBlock { Text = desc };
+            var d = new TextBlock { Text = desc, Margin = new Thickness(0, 2, 0, 0) };
             d.SetResourceReference(StyleProperty, "Caption");
             sp.Children.Add(d);
         }
@@ -176,7 +180,7 @@ public sealed class SettingsPage : UserControl, IPage
         return sp;
     }
 
-    static TextBlock Link(string text, Action a)
+    internal static TextBlock Link(string text, Action a)
     {
         var h = new Hyperlink(new Run(text));
         h.Click += (_, _) => a();
@@ -208,12 +212,26 @@ public sealed class SettingsPage : UserControl, IPage
             .Select(x => (Sched: x, File: St.Find(x.Rel)))
             .OrderBy(x => x.File?.Name ?? x.Sched.Rel, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(x => x.Sched.NextRun(DateTime.Now) ?? DateTime.MaxValue).ToList();
-        var rowsPanel = new StackPanel();
-        if (list.Count == 0) rowsPanel.Children.Add(Caption(Loc.T("schedNone")));
+        var refresh = IconBtn(Glyphs.Refresh, Loc.T("schedRefreshTip"), () => { if (svc != null) _ = svc.RefreshAsync(); });
+        refresh.IsEnabled = svc is { Checking: false };
+
+
+
+        if (list.Count == 0)
+        {
+            string note = svc is { Checking: true } ? Loc.T("schedChecking")
+                : svc?.QueryError != null ? Loc.F("schedQueryFail", svc.QueryError)
+                : Loc.T("schedNone");
+            Card(Glyphs.Clock, Loc.T("schedListTitle"), note, refresh, null, schedHost);
+        }
+        else
+        {
+            var rowsPanel = new StackPanel();
+
         var culture = System.Globalization.CultureInfo.GetCultureInfo(Loc.Language == "ru" ? "ru-RU" : "en-US");
         foreach (var (sc, f) in list)
         {
-            var row = new DockPanel { Margin = new Thickness(0, 4, 0, 4) };
+            var row = new DockPanel { MinHeight = 48, Margin = new Thickness(0, 4, 0, 4) };
             var actions = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
             string state = svc?.StateOf(sc.Id) ?? "";
             if (state is "missing" or "outdated" && f != null)
@@ -257,7 +275,7 @@ public sealed class SettingsPage : UserControl, IPage
             DockPanel.SetDock(actions, Dock.Right);
             row.Children.Add(actions);
 
-            var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+            var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 12, 0) };
             text.Children.Add(new TextBlock { Text = f?.Name ?? sc.Rel, FontSize = 14, TextTrimming = TextTrimming.CharacterEllipsis, ToolTip = f?.Rel ?? sc.Rel });
             var parts = new List<string> { sc.Describe() };
             if (sc.Preset.Length > 0) parts.Add(Loc.F("schedPresetPart", sc.Preset));
@@ -277,9 +295,12 @@ public sealed class SettingsPage : UserControl, IPage
         }
         if (svc is { Checking: true }) rowsPanel.Children.Add(Caption(Loc.T("schedChecking")));
         else if (svc?.QueryError != null) rowsPanel.Children.Add(Caption(Loc.F("schedQueryFail", svc.QueryError)));
-        var refresh = IconBtn(Glyphs.Refresh, Loc.T("schedRefreshTip"), () => { if (svc != null) _ = svc.RefreshAsync(); });
-        refresh.IsEnabled = svc is { Checking: false };
         Card(Glyphs.Clock, Loc.T("schedListTitle"), Loc.T("schedListNote"), refresh, rowsPanel, schedHost);
+        }
+
+
+
+
         if (svc?.Last is { Orphans.Count: > 0 } last)
         {
             Card(Glyphs.Warning, Loc.F("schedOrphans", last.Orphans.Count), Loc.T("schedOrphansNote") + "\n" + string.Join("\n", last.Orphans.Take(5)) + (last.Orphans.Count > 5 ? "\n…" : ""),
@@ -313,6 +334,7 @@ public sealed class SettingsPage : UserControl, IPage
             {
                 try { AutoStart.Set(on); App.Status(on ? Loc.F("setAutostartNote", AutoStart.Command) : Loc.T("setAutostart") + ": " + Loc.T("offWord")); }
                 catch (Exception ex) { App.Status(Loc.F("setAutostartFail", ex.Message), true); }
+                if (body.Children.Count > 0) return;
                 Build();
             }));
         Card("\uE73F", Loc.T("setStartMin"), Loc.T("setStartMinNote"), Toggle(s.StartMinimized, on => { s.StartMinimized = on; St.SaveSettings(); }));
@@ -326,19 +348,29 @@ public sealed class SettingsPage : UserControl, IPage
         Card(Glyphs.Color, Loc.T("setTheme"), null,
             Combo(new[] { ("system", Loc.T("setThemeSystem")), ("light", Loc.T("setThemeLight")), ("dark", Loc.T("setThemeDark")) }, s.Theme,
                 v => { s.Theme = v; St.SaveSettings(); Dispatcher.BeginInvoke(() => ThemeManager.Apply(s)); }));
-        // Accent: "Windows accent" on its own line, then a tidy row of 32 px swatches with 8 px gaps
-        var accentPanel = new StackPanel();
-        var sys = new RadioButton { Content = Loc.T("setAccentSystem"), ToolTip = Loc.T("setAccentSystemTip"), GroupName = "accent", IsChecked = s.Accent == "system", MinWidth = 0, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 0, 0, 8) };
+        // Accent: system accent swatch and preset choices in one tidy row of 28 px swatches
+        var accentRow = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+        Color sysColor;
+        try { sysColor = SystemColors.AccentColor; } catch { sysColor = Color.FromRgb(0x00, 0x67, 0xC0); }
+        var sys = new RadioButton
+        {
+            GroupName = "accent", IsChecked = s.Accent == "system", ToolTip = Loc.T("setAccentSystemTip"),
+            Width = 28, Height = 28, MinWidth = 0, MinHeight = 0, Padding = new Thickness(0), Margin = new Thickness(0),
+            VerticalAlignment = VerticalAlignment.Center, Cursor = Cursors.Hand, FocusVisualStyle = null,
+            Template = SwatchTemplate(sysColor)
+        };
+        System.Windows.Automation.AutomationProperties.SetName(sys, Loc.T("setAccentSystem"));
         sys.Checked += (_, _) => { s.Accent = "system"; St.SaveSettings(); ThemeManager.Apply(s); };
-        accentPanel.Children.Add(sys);
-        var swatches = new WrapPanel { Orientation = Orientation.Horizontal };
+
+        var swatches = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+        swatches.Children.Add(sys);
         foreach (var hex in Settings.AccentChoices)
         {
             var color = ThemeManager.ParseColor(hex, Colors.Gray);
             var rb = new RadioButton
             {
                 GroupName = "accent", IsChecked = string.Equals(s.Accent, hex, StringComparison.OrdinalIgnoreCase), ToolTip = hex,
-                Width = 32, Height = 32, MinWidth = 0, MinHeight = 0, Padding = new Thickness(0), Margin = new Thickness(0, 0, 8, 8),
+                Width = 28, Height = 28, MinWidth = 0, MinHeight = 0, Padding = new Thickness(0), Margin = new Thickness(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center,
                 Cursor = Cursors.Hand, FocusVisualStyle = null, Template = SwatchTemplate(color)
             };
             System.Windows.Automation.AutomationProperties.SetName(rb, hex);
@@ -346,10 +378,11 @@ public sealed class SettingsPage : UserControl, IPage
             rb.Checked += (_, _) => { s.Accent = h; St.SaveSettings(); ThemeManager.Apply(s); };
             swatches.Children.Add(rb);
         }
-        accentPanel.Children.Add(swatches);
-        var colorsLink = Link(Loc.T("setColorsLink"), () => ShellOps.Open("ms-settings:colors"));
-        colorsLink.Margin = new Thickness(0);
-        Card("\uE771", Loc.T("setAccent"), Loc.T("setAccentDesc"), colorsLink, accentPanel);
+        accentRow.Children.Add(swatches);
+        var colorsBtn = IconBtn("\uE8A7", Loc.T("setColorsLink"), () => ShellOps.Open("ms-settings:colors"));
+        colorsBtn.Margin = new Thickness(8, 0, 0, 0);
+        accentRow.Children.Add(colorsBtn);
+        Card("\uE771", Loc.T("setAccent"), Loc.T("setAccentDesc"), accentRow);
 
         // Running
         Section(Loc.T("secRun"));
@@ -377,21 +410,24 @@ public sealed class SettingsPage : UserControl, IPage
         Section(Loc.T("setEngines"));
         if (!St.PythonChecked && !St.PythonSearching) Dispatcher.BeginInvoke(() => { if (!St.PythonChecked && !St.PythonSearching) _ = St.FindPythonAsync(); });
         var engHost = new StackPanel();
-        void ShowShell()
+        void ShowShell(bool animate = false)
         {
             engHost.Children.Clear();
             if (_shellView == "py") BuildPython(engHost);
             else if (_shellView == "custom") BuildCustom(engHost);
             else BuildPowerShell(engHost);
+            if (animate) Motion.Enter(engHost, 6, 167);
         }
         Card(Glyphs.Script, Loc.T("setShell"), Loc.T("setShellNote"),
-            Combo(new[] { ("ps", "PowerShell"), ("py", "Python"), ("custom", Loc.T("setShellCustom")) }, _shellView, v => { _shellView = v; ShowShell(); }));
+            Combo(new[] { ("ps", "PowerShell"), ("py", "Python"), ("custom", Loc.T("setShellCustom")) }, _shellView, v => { _shellView = v; ShowShell(true); }));
         body.Children.Add(engHost);
         ShowShell();
 
         // Safety
         Section(Loc.T("setSafety"));
-        Card(Glyphs.Shield, Loc.T("setSafetyOn"), Loc.T("setSafetyNote"), Toggle(s.SafetyWarnings, _ => { ToggleSafety(); Build(); }));
+        CheckBox? safetyToggle = null;
+        safetyToggle = Toggle(s.SafetyWarnings, _ => { ToggleSafety(); if (safetyToggle != null) safetyToggle.IsChecked = s.SafetyWarnings; });
+        Card(Glyphs.Shield, Loc.T("setSafetyOn"), Loc.T("setSafetyNote"), safetyToggle);
         BuildSources();
 
         // History
@@ -443,8 +479,8 @@ public sealed class SettingsPage : UserControl, IPage
     {
         var t = new ControlTemplate(typeof(RadioButton));
         var grid = new FrameworkElementFactory(typeof(Grid));
-        grid.SetValue(WidthProperty, 32.0);
-        grid.SetValue(HeightProperty, 32.0);
+        grid.SetValue(WidthProperty, 28.0);
+        grid.SetValue(HeightProperty, 28.0);
         grid.SetValue(Panel.BackgroundProperty, Brushes.Transparent);
         var ring = new FrameworkElementFactory(typeof(Ellipse), "Ring");
         ring.SetValue(Shape.StrokeThicknessProperty, 2.0);
@@ -452,11 +488,16 @@ public sealed class SettingsPage : UserControl, IPage
         var fill = new FrameworkElementFactory(typeof(Ellipse));
         fill.SetValue(Shape.FillProperty, new SolidColorBrush(c));
         fill.SetValue(MarginProperty, new Thickness(4));
+        var hoverRing = new FrameworkElementFactory(typeof(Ellipse), "HoverRing");
+        hoverRing.SetValue(Shape.StrokeThicknessProperty, 2.0);
+        hoverRing.SetValue(Shape.StrokeProperty, new DynamicResourceExtension("ControlStrongStrokeColorDefaultBrush"));
+        hoverRing.SetValue(OpacityProperty, 0.0);
+        grid.AppendChild(hoverRing);
         grid.AppendChild(ring);
         grid.AppendChild(fill);
         t.VisualTree = grid;
         var hover = new Trigger { Property = IsMouseOverProperty, Value = true };
-        hover.Setters.Add(new Setter(Shape.StrokeProperty, new DynamicResourceExtension("ControlStrongStrokeColorDefaultBrush"), "Ring"));
+        hover.Setters.Add(new Setter(Motion.ShowProperty, true, "HoverRing"));
         t.Triggers.Add(hover);
         var focus = new Trigger { Property = FocusRing.ShowProperty, Value = true };
         focus.Setters.Add(new Setter(Shape.StrokeProperty, new DynamicResourceExtension("FocusStrokeColorOuterBrush"), "Ring"));
@@ -500,15 +541,17 @@ public sealed class SettingsPage : UserControl, IPage
         }
         list.Visibility = _extFoldersExpanded ? Visibility.Visible : Visibility.Collapsed;
 
-        var toggleBtn = new Button { Content = _extFoldersExpanded ? Glyphs.ChevronUp : Glyphs.ChevronDown, Margin = new Thickness(4, 0, 0, 0) };
+        var toggleBtn = new Button { Content = Glyphs.ChevronDown, Margin = new Thickness(4, 0, 0, 0) };
         toggleBtn.SetResourceReference(StyleProperty, "IconButton");
         Ico.SetSize(toggleBtn, 12);
         System.Windows.Automation.AutomationProperties.SetName(toggleBtn, Loc.T("setExtFolders"));
+        Motion.Rotate(toggleBtn, _extFoldersExpanded ? 180 : 0, false);
         toggleBtn.Click += (_, _) =>
         {
             _extFoldersExpanded = !_extFoldersExpanded;
-            list.Visibility = _extFoldersExpanded ? Visibility.Visible : Visibility.Collapsed;
-            toggleBtn.Content = _extFoldersExpanded ? Glyphs.ChevronUp : Glyphs.ChevronDown;
+
+            Motion.Rotate(toggleBtn, _extFoldersExpanded ? 180 : 0);
+            Motion.Expand(list, _extFoldersExpanded);
         };
 
         Card(Glyphs.Folder, Loc.T("setExtFolders"), Loc.T("setExtNote"), Row(Btn(Loc.T("setExtAdd"), AddExternalFolder), toggleBtn), list);
@@ -612,15 +655,17 @@ public sealed class SettingsPage : UserControl, IPage
         list.Visibility = _sourcesExpanded ? Visibility.Visible : Visibility.Collapsed;
 
         // Chevron button, the same icon button as in the Compatibility card: up when expanded, down when collapsed
-        var toggleBtn = new Button { Content = _sourcesExpanded ? Glyphs.ChevronUp : Glyphs.ChevronDown, Margin = new Thickness(4, 0, 0, 0) };
+        var toggleBtn = new Button { Content = Glyphs.ChevronDown, Margin = new Thickness(4, 0, 0, 0) };
         toggleBtn.SetResourceReference(StyleProperty, "IconButton");
         Ico.SetSize(toggleBtn, 12);
         System.Windows.Automation.AutomationProperties.SetName(toggleBtn, Loc.T("setSources"));
+        Motion.Rotate(toggleBtn, _sourcesExpanded ? 180 : 0, false);
         toggleBtn.Click += (_, _) =>
         {
             _sourcesExpanded = !_sourcesExpanded;
-            list.Visibility = _sourcesExpanded ? Visibility.Visible : Visibility.Collapsed;
-            toggleBtn.Content = _sourcesExpanded ? Glyphs.ChevronUp : Glyphs.ChevronDown;
+
+            Motion.Rotate(toggleBtn, _sourcesExpanded ? 180 : 0);
+            Motion.Expand(list, _sourcesExpanded);
         };
 
         Card(Glyphs.Globe, Loc.T("setSources"), Loc.T("setSourcesNote"), toggleBtn, list);

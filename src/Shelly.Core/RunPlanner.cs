@@ -248,8 +248,8 @@ public static class RunPlanner
         {
             File = f, Mode = m, ArgText = argText, Exe = exe, Engine = engine, Origin = o.Origin, Preset = o.Preset,
             InlineArgs = RunArgs.InlineArgs(path, argText),
-            WindowArgs = done => RunArgs.WindowArgs(path, argText, admin ? hash : null, done),
-            WindowArgsWithLog = (done, log) => RunArgs.WindowArgs(path, argText, admin ? hash : null, done, log),
+            WindowArgs = done => RunArgs.WindowArgs(path, argText, admin ? hash : null, done, null, m is not (RunModes.Gui or RunModes.Hidden)),
+            WindowArgsWithLog = (done, log) => RunArgs.WindowArgs(path, argText, admin ? hash : null, done, log, m is not (RunModes.Gui or RunModes.Hidden)),
             Header = Loc.F("runHeader", f.Name, argText, EngineInfo.Short(engine), env.Now)
         });
     }

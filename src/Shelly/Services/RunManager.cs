@@ -455,7 +455,8 @@ public sealed class RunManager
         Process? p;
         try
         {
-            var psi = new ProcessStartInfo(plan.Exe, args) { UseShellExecute = true, WorkingDirectory = dir };
+            bool isHidden = mode is RunModes.Gui or RunModes.Hidden;
+            var psi = new ProcessStartInfo(plan.Exe, args) { UseShellExecute = true, WorkingDirectory = dir, WindowStyle = isHidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal };
             if (admin) psi.Verb = "runas";
             p = Process.Start(psi);
             App.Status(Loc.F(admin ? "startedAdmin" : "startedWindow", f.Name));

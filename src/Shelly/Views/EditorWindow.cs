@@ -84,7 +84,7 @@ public sealed class EditorWindow : Window
         var bar = Toolbar();
         DockPanel.SetDock(bar, Dock.Top);
         root.Children.Add(bar);
-        var status = new DockPanel { Height = 30, LastChildFill = true };
+        var status = new DockPanel { Height = 32, LastChildFill = true };
         foreach (var t in new[] { posText, encText, dirtyText }) { t.FontSize = 12; t.SetResourceReference(TextBlock.ForegroundProperty, "TextFillColorSecondaryBrush"); DockPanel.SetDock(t, Dock.Right); }
         scanText.FontSize = 12;
         scanText.SetResourceReference(TextBlock.ForegroundProperty, "TextFillColorSecondaryBrush");
@@ -191,13 +191,13 @@ public sealed class EditorWindow : Window
 
     UIElement BuildFindBar()
     {
-        findBar = new Border { Visibility = Visibility.Collapsed, Padding = new Thickness(8, 4, 8, 4) };
+        findBar = new Border { Visibility = Visibility.Collapsed, Padding = new Thickness(12, 4, 12, 4) };
         findBar.SetResourceReference(Border.BackgroundProperty, "LayerFillColorDefaultBrush");
         findBar.SetResourceReference(Border.BorderBrushProperty, "DividerStrokeColorDefaultBrush");
         findBar.BorderThickness = new Thickness(0, 0, 0, 1);
 
         var row = new StackPanel { Orientation = Orientation.Horizontal };
-        findBox = new TextBox { MinWidth = 180, Height = 26, VerticalContentAlignment = VerticalAlignment.Center, Padding = new Thickness(6, 0, 6, 0), FontSize = 13 };
+        findBox = new TextBox { MinWidth = 200, MinHeight = 28, VerticalAlignment = VerticalAlignment.Center, VerticalContentAlignment = VerticalAlignment.Center, Padding = new Thickness(8, 0, 8, 0), FontSize = 13 };
         findBox.SetResourceReference(Control.ForegroundProperty, "TextFillColorPrimaryBrush");
         findBox.SetResourceReference(Control.BackgroundProperty, "ControlFillColorDefaultBrush");
         findBox.SetResourceReference(Control.BorderBrushProperty, "ControlStrokeColorDefaultBrush");

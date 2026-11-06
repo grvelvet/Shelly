@@ -34,7 +34,7 @@ public class DialogWindow : Window
         root.Children.Add(FooterBand);
         // Grows with the content; scrolls only when the dialog would not fit on the screen
         root.Children.Add(new ScrollViewer { Content = Body, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, MaxHeight = Math.Max(320, SystemParameters.WorkArea.Height - 180) });
-        Content = root;
+        Content = root; ContentDialogLayout();
         Shelly.Views.TitleBar.Attach(this);
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) { Result = "cancel"; Close(); } };
     }
@@ -61,14 +61,14 @@ public class DialogWindow : Window
         var dp = new DockPanel { Margin = new Thickness(0, 0, 0, 16) };
         if (glyph.Length > 0)
         {
-            var ic = new TextBlock { Text = glyph, FontSize = 24, Margin = new Thickness(0, 2, 16, 0), VerticalAlignment = VerticalAlignment.Top };
+            var ic = new TextBlock { Text = glyph, FontSize = 24, Margin = new Thickness(0, 2, 12, 0), VerticalAlignment = VerticalAlignment.Top };
             ic.SetResourceReference(TextBlock.FontFamilyProperty, "IconFont");
             ic.SetResourceReference(TextBlock.ForegroundProperty, brushKey);
             DockPanel.SetDock(ic, Dock.Left);
             dp.Children.Add(ic);
         }
         var sp = new StackPanel();
-        sp.Children.Add(new TextBlock { Text = head, FontSize = 18, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
+        sp.Children.Add(new TextBlock { Text = head, FontSize = 20, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
         if (!string.IsNullOrEmpty(sub))
         {
             var t = new TextBlock { Text = sub, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) };
@@ -244,7 +244,7 @@ public static class SafetyDialog
     /// <summary>scan: ok | checking | unverified (the findings come from the built-in scanner only) | none (a Python script).</summary>
     public static Answer Show(string name, IReadOnlyList<DangerFinding> findings, string action, string scan = "ok", IReadOnlyList<string>? sources = null)
     {
-        var d = new DialogWindow(Loc.T("dzTitle"), 580);
+        var d = new DialogWindow(Loc.T("dzTitle"), 548);
         bool high = Safety.Level(findings) == "high";
         bool asks = Safety.Blocking(findings).Count > 0;
         if (!asks)
@@ -285,14 +285,11 @@ public static class SafetyDialog
         // Same slot and spacing as "I understand" (only one of the two is shown); was 10
         var trust = new CheckBox { Content = Loc.T("dzTrust"), Margin = new Thickness(0, 16, 0, 0) };
         if (high) d.Body.Children.Add(understand);
-        // Red scripts cannot be trusted; builds and administrator runs never trust (they always ask); unverified findings are not worth remembering
-        bool canTrust = !high && asks && action != "build" && action != "admin" && scan == "ok";
-        if (canTrust) d.Body.Children.Add(trust);
-        else if (high)
+                bool canTrust = asks && action != "build" && action != "admin" && scan == "ok";
+        if (canTrust)
         {
-            var nt = DialogWindow.Text(Loc.T("dzNoTrustRed"), "TextFillColorSecondaryBrush", 12);
-            nt.Margin = new Thickness(0, 12, 0, 0);
-            d.Body.Children.Add(nt);
+            trust.IsChecked = true;
+            d.Body.Children.Add(trust);
         }
         d.AddLeftButton("edit", Loc.T("dzEdit"));
         string runText = action == "admin" ? Loc.T("runAdmin") : action == "build" ? Loc.T("dzReviewed") : Loc.T("dzRun");
@@ -323,7 +320,7 @@ public static class BuildConfirmDialog
 {
     public static bool Show(string name, IReadOnlyList<DangerFinding> findings, ZoneInfo? zone, string scan)
     {
-        var d = new DialogWindow(Loc.T("buildExe"), 580);
+        var d = new DialogWindow(Loc.T("buildExe"), 548);
         d.AddHeader(Glyphs.Build, "SystemFillColorCautionBrush", Loc.F("bcHead", name), Loc.T("bcSub"));
         if (zone != null) d.Body.Children.Add(DialogWindow.Text(Loc.F("bcZone", zone.Source.Length > 0 ? zone.Source : Loc.T("motwNoUrl")), "SystemFillColorCautionBrush"));
         if (scan != "ok") d.Body.Children.Add(DialogWindow.Text(Loc.T(ScanNotes.Key(scan)!), "SystemFillColorCautionBrush", 12));
@@ -362,7 +359,7 @@ public static class MotwDialog
     /// <summary>unblock | edit | cancel</summary>
     public static string Show(string name, ZoneInfo zone, IReadOnlyList<(string Path, ZoneInfo Zone)> others, IReadOnlyList<DangerFinding> findings, string scan)
     {
-        var d = new DialogWindow(Loc.T("motwTitle"), 580);
+        var d = new DialogWindow(Loc.T("motwTitle"), 548);
         d.ContentDialogLayout();
         d.AddHeader(Glyphs.Download, "SystemFillColorCautionBrush", Loc.F("motwHead", name), Loc.T("motwSub"));
         var grid = new StackPanel();

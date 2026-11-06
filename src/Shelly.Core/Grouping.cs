@@ -245,7 +245,7 @@ public static class ScriptHeader
             if (t.Length == 0) continue;
             if (t.StartsWith("<#")) { inBlock = !t.Substring(2).Contains("#>"); continue; }
             if (!t.StartsWith("#")) break;
-            var m = System.Text.RegularExpressions.Regex.Match(t, @"^#\s*Shelly-Mode\s*:\s*(inline|window|admin)\s*$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var m = System.Text.RegularExpressions.Regex.Match(t, @"^#\s*Shelly-Mode\s*:\s*(inline|window|admin|gui|hidden)\s*$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             if (m.Success) return m.Groups[1].Value.ToLowerInvariant();
         }
         return null;

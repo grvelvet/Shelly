@@ -366,7 +366,7 @@ public static class ScriptActions
         // Downloaded scripts are unblocked first; red scripts go through the full danger review (no trust is used or
         // given: a built .exe runs without Shelly's checks); anything flagged needs the typed confirmation
         if (!St.Runs.MotwGate(f, meta)) { App.Status(Loc.T("buildCancelled")); return; }
-        if (Safety.Level(meta.Danger) == "high")
+        if (St.Settings.SafetyWarnings && Safety.Level(meta.Danger) == "high")
         {
             var review = SafetyDialog.Show(f.Name, meta.Danger, "build", meta.Scan);
             if (review.Choice == "edit") { App.OpenEditor(f.Path); return; }
@@ -386,7 +386,8 @@ public static class ScriptActions
         string engine = choice == "auto" ? meta.Engine.Engine : choice;
         App.Status(Loc.F("buildExeWait", f.Name));
         string? icon = IconUtil.IcoForBuild(St.IconPath(f.Rel)) ?? (File.Exists(St.Paths.AppIcon) ? St.Paths.AppIcon : null);
-        var r = await Task.Run(() => ExeBuilder.Build(f.Path, outPath, engine, icon, "1.0.0.0"));
+        bool isGui = ScriptHeader.ModeOf(f) is RunModes.Gui or RunModes.Hidden;
+        var r = await Task.Run(() => ExeBuilder.Build(f.Path, outPath, engine, icon, "1.0.0.0", isGui));
         AppLog.Write(Loc.F("buildHeader", f.Name, EngineInfo.Name(engine)) + (r.Log.Length > 0 ? "\n" + r.Log : ""));
         if (r.Ok)
         {

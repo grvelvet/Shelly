@@ -82,18 +82,18 @@ public static class Safety
     }
 
     /// <summary>Can "don't warn again" be offered? Not for scripts with a danger (red) finding.</summary>
-    internal static bool CanTrust(IEnumerable<DangerFinding> findings) => Level(findings) != "high";
+    internal static bool CanTrust(IEnumerable<DangerFinding> findings) => findings != null;
 
     /// <summary>Is the safety dialog needed before this action? action: inline | window | admin | build.
-    /// Danger (red) findings ask on every run: they cannot be trusted and the Safety warnings switch does not turn
-    /// them off. Administrator runs always ask (a confirmation when nothing was found), whatever is trusted and whatever
-    /// the Safety warnings switch says; info findings never ask. hash = the content hash the findings belong to (the file is not read again).</summary>
+    /// Administrator runs always ask (a confirmation when nothing was found).
+    /// If SafetyWarnings is turned off, ordinary runs do not ask.
+    /// Otherwise, findings ask on the first run of this version (by SHA-256) and are remembered until the file is modified.
+    /// hash = the content hash the findings belong to (the file is not read again).</summary>
     public static bool Needed(Settings s, IReadOnlyCollection<DangerFinding> findings, string action, string rel, string path, string? hash = null)
     {
         if (action == "admin") return true;
-        if (Level(findings) == "high") return true;
         if (!s.SafetyWarnings) return false;
-        if (Blocking(findings).Count == 0 && action != "admin") return false;
+        if (Blocking(findings).Count == 0) return false;
         return !IsTrusted(s, hash != null ? TrustKeyOf(rel, hash) : TrustKey(rel, path));
     }
 }

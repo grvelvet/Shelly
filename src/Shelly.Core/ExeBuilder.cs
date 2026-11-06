@@ -52,7 +52,7 @@ public static class ExeBuilder
             .Replace("%ENGINE%", Quoting.CsString(engine));
     }
 
-    public static Result Build(string scriptPath, string outPath, string engine, string? iconPath, string version)
+    public static Result Build(string scriptPath, string outPath, string engine, string? iconPath, string version, bool isGui = false)
     {
         string? csc = FindCsc();
         if (csc == null) return new(false, Loc.T("cscMissing"));
@@ -61,7 +61,8 @@ public static class ExeBuilder
         Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
         string cs = Path.Combine(tmp, "stub-" + Guid.NewGuid().ToString("N") + ".cs");
         File.WriteAllText(cs, MakeSource(File.ReadAllBytes(scriptPath), engine, version), new UTF8Encoding(true));
-        string bas = "/nologo /utf8output /nowarn:169 /optimize+ /platform:anycpu /target:exe /r:System.Windows.Forms.dll /out:" + Quoting.NativeArg(outPath);
+        string target = isGui ? "/target:winexe" : "/target:exe";
+        string bas = "/nologo /utf8output /nowarn:169 /optimize+ /platform:anycpu " + target + " /r:System.Windows.Forms.dll /out:" + Quoting.NativeArg(outPath);
         var attempts = new List<string>();
         if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath)) attempts.Add(bas + " /win32icon:" + Quoting.NativeArg(iconPath));
         attempts.Add(bas);

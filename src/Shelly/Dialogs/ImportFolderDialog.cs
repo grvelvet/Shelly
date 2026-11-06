@@ -15,15 +15,15 @@ public static class ImportFolderDialog
         var d = new DialogWindow(Loc.T("fiTitle"), 540);
         d.AddHeader(Glyphs.Folder, "AccentTextFillColorPrimaryBrush", Path.GetFileName(plan.Source), plan.Source);
 
-        d.Body.Children.Add(DialogWindow.Text(Loc.T("fiName"), "TextFillColorSecondaryBrush", 13));
-        var name = new TextBox { Text = suggested, Margin = new Thickness(0, 8, 0, 0), MinHeight = 32, MaxLength = 100 };
+        d.Body.Children.Add(DialogWindow.Text(Loc.T("fiName"), "TextFillColorSecondaryBrush", 12));
+        var name = new TextBox { Text = suggested, Margin = new Thickness(0, 4, 0, 0), MinHeight = 32, VerticalContentAlignment = VerticalAlignment.Center, MaxLength = 100 };
         System.Windows.Automation.AutomationProperties.SetName(name, Loc.T("fiName"));
         d.Body.Children.Add(name);
         var nameErr = DialogWindow.Text("", "SystemFillColorCriticalBrush", 12);
         nameErr.Margin = new Thickness(0, 4, 0, 0);
         d.Body.Children.Add(nameErr);
 
-        var head = DialogWindow.Text(Loc.F("fiScripts", plan.Scripts.Count), "TextFillColorSecondaryBrush", 13);
+        var head = DialogWindow.Text(Loc.F("fiScripts", plan.Scripts.Count), "TextFillColorSecondaryBrush", 12);
         head.Margin = new Thickness(0, 12, 0, 8);
         d.Body.Children.Add(head);
         var boxes = new List<(CheckBox Box, string Rel)>();

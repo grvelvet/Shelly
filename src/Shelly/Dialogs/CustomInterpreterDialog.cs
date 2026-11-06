@@ -23,7 +23,7 @@ public sealed class CustomInterpreterDialog : DialogWindow
     readonly TextBlock error = new() { FontSize = 12, TextWrapping = TextWrapping.Wrap, Visibility = Visibility.Collapsed, Margin = new Thickness(0, Gap, 0, 0) };
     public CustomInterpreter? Saved { get; private set; }
 
-    CustomInterpreterDialog(CustomInterpreter? existing) : base(Loc.T(existing == null ? "ciTitleNew" : "ciTitleEdit"), 560)
+    CustomInterpreterDialog(CustomInterpreter? existing) : base(Loc.T(existing == null ? "ciTitleNew" : "ciTitleEdit"), 548)
     {
         cur = existing?.Clone() ?? new CustomInterpreter { Id = CustomInterpreters.NewId() };
         ContentDialogLayout();

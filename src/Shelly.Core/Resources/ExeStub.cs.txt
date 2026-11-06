@@ -153,19 +153,27 @@ static class Program
     static void Fail(string message)
     {
         Console.Error.WriteLine(message);
+        try
+        {
+            Console.WriteLine();
+            Console.Write(MsgPressKey);
+            Console.ReadKey(true);
+        }
+        catch { }
     }
 
     [STAThread]
     static int Main(string[] args)
     {
         string exePath = Assembly.GetExecutingAssembly().Location;
-        string exeDir = Path.GetDirectoryName(exePath);
-        string baseName = Path.GetFileNameWithoutExtension(exePath);
+        string exeDir = !string.IsNullOrEmpty(exePath) ? Path.GetDirectoryName(exePath) : AppDomain.CurrentDomain.BaseDirectory;
+        string baseName = !string.IsNullOrEmpty(exePath) ? Path.GetFileNameWithoutExtension(exePath) : "script";
         byte[] data = Convert.FromBase64String(ScriptData);
         int pid = Process.GetCurrentProcess().Id;
         string token = pid + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string workDir = !string.IsNullOrEmpty(exeDir) && Directory.Exists(exeDir) ? exeDir : Path.GetTempPath();
         // The script copy is placed next to the exe, so $PSScriptRoot points to the exe folder
-        tempPath = WriteScript(exeDir, "." + baseName + "-" + token + ".ps1", data);
+        tempPath = WriteScript(workDir, "." + baseName + "-" + token + ".ps1", data);
         if (tempPath == null) tempPath = WriteScript(Path.GetTempPath(), baseName + "-" + token + ".ps1", data);
         if (tempPath == null) { Fail(MsgTempFail); return 1; }
 
@@ -173,21 +181,34 @@ static class Program
         cmd.Append("-File ").Append(Quote(tempPath));
         foreach (string a in args) cmd.Append(' ').Append(Quote(a));
 
-        ProcessStartInfo psi = new ProcessStartInfo(PowerShellExe(), cmd.ToString());
-        psi.UseShellExecute = false;
+        string targetExe = PowerShellExe();
+        bool isStore = targetExe.IndexOf(@"\WindowsApps\", StringComparison.OrdinalIgnoreCase) >= 0;
+
+        ProcessStartInfo psi = new ProcessStartInfo(targetExe, cmd.ToString())
+        {
+            UseShellExecute = isStore,
+            WorkingDirectory = workDir
+        };
         ctrlHandler = new ConsoleCtrlHandler(OnCtrl);
         SetConsoleCtrlHandler(ctrlHandler, true);
         int code = 1;
         try
         {
-            using (Process p = Process.Start(psi)) { p.WaitForExit(); code = p.ExitCode; }
+            using (Process p = Process.Start(psi))
+            {
+                if (p != null)
+                {
+                    p.WaitForExit();
+                    code = p.ExitCode;
+                }
+            }
         }
-        catch (Exception e) { Fail(MsgPsFail + e.Message); }
+        catch (Exception e) { Fail(MsgPsFail + e.Message); return 1; }
         Cleanup();
         // If the console window was opened just for this exe (double-click), keep it open
         try
         {
-            if (GetConsoleProcessList(new uint[4], 4) == 1)
+            if (GetConsoleProcessList(new uint[4], 4) <= 2)
             {
                 Console.WriteLine();
                 Console.Write(MsgPressKey);

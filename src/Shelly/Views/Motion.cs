@@ -107,4 +107,98 @@ public static class Motion
         a.Freeze();
         u.BeginAnimation(UIElement.OpacityProperty, a);
     }
+
+    /// <summary>Slides the ToggleSwitch knob smoothly between Off (0 px) and On (20 px) over 167 ms.</summary>
+    public static readonly DependencyProperty KnobOnProperty = DependencyProperty.RegisterAttached(
+        "KnobOn", typeof(bool), typeof(Motion), new PropertyMetadata(false, (d, e) => SlideKnob(d, (bool)e.NewValue)));
+    public static bool GetKnobOn(DependencyObject d) => (bool)d.GetValue(KnobOnProperty);
+    public static void SetKnobOn(DependencyObject d, bool v) => d.SetValue(KnobOnProperty, v);
+
+    static void SlideKnob(DependencyObject d, bool on)
+    {
+        if (d is not FrameworkElement u) return;
+        double to = on ? 20.0 : 0.0;
+        var tt = u.RenderTransform as TranslateTransform;
+        if (tt == null || tt.IsFrozen) { tt = new TranslateTransform(); u.RenderTransform = tt; }
+        if (!Enabled || !u.IsVisible || !u.IsLoaded)
+        {
+            tt.BeginAnimation(TranslateTransform.XProperty, null);
+            tt.X = to;
+            return;
+        }
+        tt.BeginAnimation(TranslateTransform.XProperty, To(to, 167));
+    }
+
+    /// <summary>Smoothly rotates an element (such as an expander chevron) around its center.</summary>
+    public static void Rotate(UIElement u, double angle, bool animate = true, int ms = 167)
+    {
+        u.RenderTransformOrigin = new Point(0.5, 0.5);
+        var rt = u.RenderTransform as RotateTransform;
+        if (rt == null || rt.IsFrozen) { rt = new RotateTransform(); u.RenderTransform = rt; }
+        if (!animate || !Enabled)
+        {
+            rt.BeginAnimation(RotateTransform.AngleProperty, null);
+            rt.Angle = angle;
+            return;
+        }
+        rt.BeginAnimation(RotateTransform.AngleProperty, To(angle, ms));
+    }
+
+    /// <summary>Smoothly expands or collapses a vertical panel (Height + Opacity on the Fluent decelerate curve).</summary>
+    public static void Expand(FrameworkElement el, bool expand, int ms = 167)
+    {
+        el.ClipToBounds = true;
+        if (!Enabled)
+        {
+            el.BeginAnimation(FrameworkElement.HeightProperty, null);
+            el.BeginAnimation(UIElement.OpacityProperty, null);
+            el.Height = double.NaN;
+            el.Opacity = 1;
+            el.Visibility = expand ? Visibility.Visible : Visibility.Collapsed;
+            return;
+        }
+        if (expand)
+        {
+            el.BeginAnimation(FrameworkElement.HeightProperty, null);
+            el.Height = double.NaN;
+            el.Visibility = Visibility.Visible;
+            double availW = el.ActualWidth > 0 ? el.ActualWidth : (el.Parent is FrameworkElement p && p.ActualWidth > 0 ? p.ActualWidth : double.PositiveInfinity);
+            el.Measure(new Size(availW, double.PositiveInfinity));
+            double targetH = el.DesiredSize.Height;
+            if (targetH <= 0)
+            {
+                el.Opacity = 1;
+                return;
+            }
+            var ha = FromTo(0, targetH, ms);
+            ha.Completed += (_, _) =>
+            {
+                if (el.Visibility == Visibility.Visible)
+                {
+                    el.BeginAnimation(FrameworkElement.HeightProperty, null);
+                    el.Height = double.NaN;
+                }
+            };
+            el.BeginAnimation(FrameworkElement.HeightProperty, ha);
+            el.BeginAnimation(UIElement.OpacityProperty, FromTo(0, 1, ms));
+        }
+        else
+        {
+            double fromH = el.ActualHeight;
+            if (fromH <= 0)
+            {
+                el.Visibility = Visibility.Collapsed;
+                return;
+            }
+            var ha = FromTo(fromH, 0, ms);
+            ha.Completed += (_, _) =>
+            {
+                el.BeginAnimation(FrameworkElement.HeightProperty, null);
+                el.Height = double.NaN;
+                el.Visibility = Visibility.Collapsed;
+            };
+            el.BeginAnimation(FrameworkElement.HeightProperty, ha);
+            el.BeginAnimation(UIElement.OpacityProperty, FromTo(1, 0, ms));
+        }
+    }
 }

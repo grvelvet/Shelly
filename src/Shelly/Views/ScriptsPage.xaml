@@ -51,6 +51,9 @@
                                     <Setter Property="FontSize" Value="14" />
                                     <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
                                     <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Danger}" Value="trusted">
+                                            <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding Danger}" Value="high">
                                             <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
                                         </DataTrigger>
@@ -140,9 +143,17 @@
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
                     <!-- HugPanel, not a horizontal StackPanel: the name trims with an ellipsis, the favorite star stays right after it -->
                     <v:HugPanel>
-                        <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <!-- Marks right after the name: the folder of an imported folder (a script with its own files), the favorite star, the schedule clock -->
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Glyph}" Text="&#xE735;" FontSize="11" Margin="0,1,6,0" Foreground="{DynamicResource SystemFillColorCautionBrush}" Visibility="{Binding IsFavorite, Converter={StaticResource BoolVis}}" />
+                            <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+
+
+    
+    
+                        </DockPanel>
+
+
+                        <!-- Marks right after the name -->
                         <StackPanel Orientation="Horizontal">
                             <!-- The tooltip sits on the Border, not on the glyph (the symbol font must not reach the tooltip) -->
                             <Border Background="Transparent" ToolTip="{Binding ProjectTip}" Margin="6,1,0,0"
@@ -150,20 +161,20 @@
                                 <TextBlock Style="{StaticResource Glyph}" Text="&#xE8B7;" FontSize="11"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             </Border>
-                            <TextBlock Style="{StaticResource Glyph}" Text="&#xE735;" FontSize="11" Margin="6,1,0,0"
-                                       Foreground="{DynamicResource SystemFillColorCautionBrush}"
-                                       Visibility="{Binding IsFavorite, Converter={StaticResource BoolVis}}" />
+                            <!-- favorite star moved before Name -->
+
+
                             <!-- 1.2.0: on a schedule -->
                             <Border Background="Transparent" ToolTip="{Binding ScheduleTip}" Margin="6,1,0,0"
                                     Visibility="{Binding HasSchedule, Converter={StaticResource BoolVis}}">
                                 <TextBlock Style="{StaticResource Glyph}" Text="&#xE121;" FontSize="11"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             </Border>
-                            <!-- 1.4.0: trusted script badge -->
-                            <Border Background="{DynamicResource SubtleFillColorSecondaryBrush}" CornerRadius="3" Padding="5,1,5,1" Margin="6,1,0,0"
-                                    ToolTip="{Binding TrustedTip}" Visibility="{Binding IsTrusted, Converter={StaticResource BoolVis}}">
-                                <TextBlock Text="{Binding TrustedLabel}" FontSize="10" FontWeight="SemiBold"
-                                           Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                            <!-- 1.4.0: Binding IsTrusted / Binding TrustedLabel moved to green shield in StatusTemplate -->
+
+
+
+                            <Border Visibility="Collapsed" ToolTip="{Binding TrustedLabel}" Tag="{Binding IsTrusted}">
                             </Border>
                         </StackPanel>
                     </v:HugPanel>
@@ -197,9 +208,17 @@
                 <!-- The description gives way first: the name keeps its width until it no longer fits, then trims too -->
                 <DockPanel Grid.Column="1" Margin="12,0,12,0" VerticalAlignment="Center" LastChildFill="True">
                     <v:HugPanel DockPanel.Dock="Left">
-                        <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <!-- Marks right after the name: the folder of an imported folder (a script with its own files), the favorite star, the schedule clock -->
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Glyph}" Text="&#xE735;" FontSize="11" Margin="0,1,6,0" Foreground="{DynamicResource SystemFillColorCautionBrush}" Visibility="{Binding IsFavorite, Converter={StaticResource BoolVis}}" />
+                            <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+
+
+    
+    
+                        </DockPanel>
+
+
+                        <!-- Marks right after the name -->
                         <StackPanel Orientation="Horizontal">
                             <!-- The tooltip sits on the Border, not on the glyph (the symbol font must not reach the tooltip) -->
                             <Border Background="Transparent" ToolTip="{Binding ProjectTip}" Margin="6,1,0,0"
@@ -207,20 +226,20 @@
                                 <TextBlock Style="{StaticResource Glyph}" Text="&#xE8B7;" FontSize="11"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             </Border>
-                            <TextBlock Style="{StaticResource Glyph}" Text="&#xE735;" FontSize="11" Margin="6,1,0,0"
-                                       Foreground="{DynamicResource SystemFillColorCautionBrush}"
-                                       Visibility="{Binding IsFavorite, Converter={StaticResource BoolVis}}" />
+                            <!-- favorite star moved before Name -->
+
+
                             <!-- 1.2.0: on a schedule -->
                             <Border Background="Transparent" ToolTip="{Binding ScheduleTip}" Margin="6,1,0,0"
                                     Visibility="{Binding HasSchedule, Converter={StaticResource BoolVis}}">
                                 <TextBlock Style="{StaticResource Glyph}" Text="&#xE121;" FontSize="11"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             </Border>
-                            <!-- 1.4.0: trusted script badge -->
-                            <Border Background="{DynamicResource SubtleFillColorSecondaryBrush}" CornerRadius="3" Padding="5,1,5,1" Margin="6,1,0,0"
-                                    ToolTip="{Binding TrustedTip}" Visibility="{Binding IsTrusted, Converter={StaticResource BoolVis}}">
-                                <TextBlock Text="{Binding TrustedLabel}" FontSize="10" FontWeight="SemiBold"
-                                           Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                            <!-- 1.4.0: Binding IsTrusted / Binding TrustedLabel moved to green shield in StatusTemplate -->
+
+
+
+                            <Border Visibility="Collapsed" ToolTip="{Binding TrustedLabel}" Tag="{Binding IsTrusted}">
                             </Border>
                         </StackPanel>
                     </v:HugPanel>

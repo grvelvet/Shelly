@@ -96,8 +96,8 @@ public class SafetyScannerTests
         Assert.False(Safety.Needed(s, warn, "inline", "x.ps1", path));                            // warnings: trust by SHA-256
         Assert.True(Safety.Needed(s, warn, "admin", "x.ps1", path));                              // ...but never for an administrator run
         Assert.True(Safety.Needed(s, Array.Empty<DangerFinding>(), "admin", "x.ps1", path));
-        Assert.True(Safety.Needed(s, f, "inline", "x.ps1", path));                                // danger: asks every time
-        Assert.False(Safety.CanTrust(f));
+        Assert.False(Safety.Needed(s, f, "inline", "x.ps1", path));                               // danger: also trusted by SHA-256 for this version
+        Assert.True(Safety.CanTrust(f));
         Assert.True(Safety.CanTrust(warn));
         File.AppendAllText(path, "\n# changed");                                                  // a new version is not trusted
         Assert.True(Safety.Needed(s, warn, "inline", "x.ps1", path));
@@ -105,7 +105,7 @@ public class SafetyScannerTests
         s.SafetyWarnings = false;
         Assert.True(Safety.Needed(s, warn, "admin", "x.ps1", path));                              // the switch doesn't silence an administrator run either
         Assert.True(Safety.Needed(s, Array.Empty<DangerFinding>(), "admin", "x.ps1", path));
-        Assert.True(Safety.Needed(s, f, "inline", "x.ps1", path));                                // the switch doesn't silence danger
+        Assert.False(Safety.Needed(s, f, "inline", "x.ps1", path));                              // when switch is off, danger is silenced for non-admin
     }
 
     [Fact]

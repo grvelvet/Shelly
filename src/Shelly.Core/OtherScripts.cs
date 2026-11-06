@@ -321,6 +321,7 @@ public static class WindowHost
 {
     /// <summary>The start of every window run's command line (PowerShell scripts, Python, batch, custom interpreters).</summary>
     public const string Prefix = "-NoProfile -NoExit -ExecutionPolicy Bypass -Command ";
+    public const string HiddenPrefix = "-NoProfile -ExecutionPolicy Bypass -Command ";
 
     /// <summary>prelude: PowerShell set after the working folder, before the label line (Python: its environment variables).</summary>
     public static string Args(string dir, string label, string call, string scriptPath, string? expectedHash, string? doneFile, string prelude = "", string? logFile = null)
