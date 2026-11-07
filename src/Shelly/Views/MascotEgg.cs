@@ -39,15 +39,25 @@ public static class MascotEgg
         RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.HighQuality);
         try
         {
-            var bmp = new BitmapImage();
-            bmp.BeginInit();
-            bmp.UriSource = new Uri("pack://application:,,,/" + Mascot.ResourcePath, UriKind.Absolute);
-            bmp.CacheOption = BitmapCacheOption.OnLoad;
-            bmp.EndInit();
-            bmp.Freeze();
-            img.Source = bmp;
+            var uri = new Uri("pack://application:,,,/" + Mascot.ResourcePath, UriKind.Absolute);
+            var sri = Application.GetResourceStream(uri);
+            if (sri != null)
+            {
+                using var raw = sri.Stream;
+                var decrypted = Mascot.DecryptImage(raw);
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.StreamSource = new MemoryStream(decrypted);
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.EndInit();
+                bmp.Freeze();
+                img.Source = bmp;
+            }
         }
-        catch (Exception ex) when (ex is IOException or NotSupportedException or InvalidOperationException) { AppLog.Write("Mascot: " + ex.Message); }
+        catch (Exception ex) when (ex is IOException or NotSupportedException or InvalidOperationException or System.Security.Cryptography.CryptographicException)
+        {
+            AppLog.Write("Mascot: " + ex.Message);
+        }
         d.Body.Children.Add(img);
         var cap = DialogWindow.Text(Loc.T(Mascot.CaptionKeys[lastCaption]), null, 14);
         cap.TextAlignment = TextAlignment.Center;

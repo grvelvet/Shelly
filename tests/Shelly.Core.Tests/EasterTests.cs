@@ -1,3 +1,4 @@
+using System.Text;
 using Xunit;
 
 namespace Shelly.Core.Tests;
@@ -5,6 +6,17 @@ namespace Shelly.Core.Tests;
 /// <summary>1.1.2: the small secret in About (triple click on the About icon shows the mascot).</summary>
 public class EasterTests
 {
+    static string RepoRoot()
+    {
+        for (var d = new DirectoryInfo(AppContext.BaseDirectory); d != null; d = d.Parent)
+        {
+            if (File.Exists(Path.Combine(d.FullName, "Directory.Build.props"))) return d.FullName;
+        }
+        throw new DirectoryNotFoundException("Repo root not found");
+    }
+
+    static string RepoPath(params string[] parts) => Path.Combine(new[] { RepoRoot() }.Concat(parts).ToArray());
+
     static string Repo(params string[] parts)
     {
         for (var d = new DirectoryInfo(AppContext.BaseDirectory); d != null; d = d.Parent)
@@ -40,17 +52,36 @@ public class EasterTests
     }
 
     [Fact]
-    public void Image_is_embedded_small_and_the_original_is_not()
+    public void Image_is_encrypted_and_embedded_small_and_the_original_is_not()
     {
         string proj = File.ReadAllText(Repo("src", "Shelly", "Shelly.csproj"));
-        Assert.Contains(@"<Resource Include=""Assets\mascot.jpg"" />", proj);
-        Assert.DoesNotContain(@"assets\mascot.jpg", proj.Replace(@"Assets\mascot.jpg", ""), StringComparison.OrdinalIgnoreCase);
-        Assert.Equal("Assets/mascot.jpg", Mascot.ResourcePath);
-        var img = File.ReadAllBytes(Repo("src", "Shelly", "Assets", "mascot.jpg"));
-        Assert.True(img.Length < 64 * 1024, $"{img.Length} bytes");
+        Assert.Contains(@"<Resource Include=""Assets\mascot.dat"" />", proj);
+        Assert.DoesNotContain(@"Assets\mascot.jpg", proj, StringComparison.OrdinalIgnoreCase);
+        Assert.False(File.Exists(RepoPath("src", "Shelly", "Assets", "mascot.jpg")));
+        Assert.Equal("Assets/mascot.dat", Mascot.ResourcePath);
+
+        // Embedded asset is encrypted: does not start with JPEG SOI marker 0xFF, 0xD8
+        var cipher = File.ReadAllBytes(Repo("src", "Shelly", "Assets", "mascot.dat"));
+        Assert.True(cipher.Length < 64 * 1024, $"{cipher.Length} bytes");
+        Assert.NotEqual(new byte[] { 0xFF, 0xD8 }, cipher.Take(2));
+
+        // Decrypts cleanly to the original crisp 450 x 600 mascot JPEG
+        var img = Mascot.DecryptImage(cipher);
         Assert.Equal(new byte[] { 0xFF, 0xD8 }, img.Take(2));
         Assert.Equal((450, 600), JpegSize(img));   // crisp at 300 x 400 DIP on 150 % scaling
         Assert.True(File.Exists(Repo("assets", "mascot.jpg")));   // full-size original for the README, not in the exe
+
+        // Stream decryption matches byte array decryption
+        using var ms = new MemoryStream(cipher);
+        var streamDecrypted = Mascot.DecryptImage(ms);
+        Assert.Equal(img, streamDecrypted);
+
+        // Encrypt roundtrip test with arbitrary data
+        byte[] testBytes = Encoding.UTF8.GetBytes("Shelly mascot test payload 2026");
+        byte[] testEnc = Mascot.EncryptImage(testBytes);
+        Assert.NotEqual(testBytes, testEnc);
+        byte[] testDec = Mascot.DecryptImage(testEnc);
+        Assert.Equal(testBytes, testDec);
     }
 
     /// <summary>Width and height from the first SOF marker.</summary>

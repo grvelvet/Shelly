@@ -43,8 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\shelly.ico" />
-    <!-- 1.1.2: the mascot (450 x 600, about 42 KB; the full-size original is assets/mascot.jpg, not embedded) -->
-    <Resource Include="Assets\mascot.jpg" />
+    <!-- 1.1.2: the mascot (encrypted payload, 450 x 600, about 42 KB; the full-size original is assets/mascot.jpg, not embedded) -->
+    <Resource Include="Assets\mascot.dat" />
     <EmbeddedResource Include="Editor\PowerShell.xshd" LogicalName="Shelly.PowerShell.xshd" />
     <EmbeddedResource Include="Editor\Batch.xshd" LogicalName="Shelly.Batch.xshd" />
   </ItemGroup>
