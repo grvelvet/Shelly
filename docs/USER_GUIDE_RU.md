@@ -2,7 +2,7 @@
 
 [English version](USER_GUIDE.md) · [README](../README.md) · [CHANGELOG](../CHANGELOG.md)
 
-Shelly — портативный запускатель PowerShell-скриптов для Windows. Он показывает все `.ps1`, `.py`, `.bat`, `.cmd` и другие из папки `Scripts` и
+Shelly — портативный лаунчер скриптов для Windows. Он показывает все `.ps1`, `.py`, `.bat`, `.cmd` и другие из папки `Scripts` и
 запускает каждый скрипт в нужном ему движке или окружении (Windows PowerShell 5.1 или 7, python, etc.). Shelly читает параметры
 скрипта, предупреждает об опасных командах в PS, ведёт историю запусков.
 ## Содержание
