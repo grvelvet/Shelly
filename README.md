@@ -11,6 +11,12 @@
 
 <p align="center"><b>A portable Windows 11-style launcher for PowerShell, Python, Batch and custom scripts.</b><br>
 Find, run, edit, check and build `.ps1` to `.exe` in one window.</p>
+<p align="center">
+  <a href="docs/USER_GUIDE.md"><b>User Guide (EN)</b></a> ·
+  <a href="docs/USER_GUIDE_RU.md"><b>Руководство (RU)</b></a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="SECURITY.md">Security</a>
+</p>
 <p align="center"><img src="docs/screenshot.png" alt="Shelly"></p>
 
 ## Download
@@ -36,8 +42,6 @@ Verify the archive against `SHA256SUMS.txt` (`Get-FileHash .\shelly-1.5.0.zip -A
 - **Schedules:** Windows Task Scheduler integration (once, daily, weekly, at sign-in, every N minutes) with headless execution when Shelly is closed.
 - **Built-in editor & linter:** AvalonEdit with light/dark syntax highlighting, code completion (`Ctrl+Space`), live diagnostics with wavy underlines and a Problems panel (`F8`), `F5` save & run, or one-click external editor (VS Code, Notepad++, ISE, custom).
 - **Build `.exe` & system integration:** compiles `.ps1` scripts to standalone console `.exe`, tray menu, global hotkey (`Ctrl+Alt+L`), taskbar jump list, English and Russian UI.
-
-Details: [User Guide (EN)](docs/USER_GUIDE.md) · [Руководство (RU)](docs/USER_GUIDE_RU.md) · [Changelog](CHANGELOG.md) · [Security](SECURITY.md)
 
 ## Language support
 
