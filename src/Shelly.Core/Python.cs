@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace Shelly.Core;
 
 /// <summary>The script languages Shelly knows, by file extension: PowerShell (.ps1), Python (.py), Batch (.bat, .cmd) and
-/// the extensions of the user's custom interpreters (1.3.0).</summary>
+/// the extensions of the user's custom interpreters.</summary>
 public static class ScriptKinds
 {
     public const string Ps1 = ".ps1";
@@ -492,9 +492,8 @@ public static class PythonRun
 
     /// <summary>Arguments for powershell.exe (or pwsh.exe) that runs the script in its own console window and keeps it open:
     /// the working folder is the script's folder, the output is UTF-8. With <paramref name="expectedHash"/> (administrator runs)
-    /// the script starts only if the file still has that SHA-256 after the UAC prompt. doneFile: the end marker (1.2.0) for the
-    /// history and the notification; the window stays open. 1.3.1: built by <see cref="WindowHost.Args"/> like batch and
-    /// custom scripts (one copy of the hash check), the same command line as before.</summary>
+    /// the script starts only if the file still has that SHA-256 after the UAC prompt. doneFile receives the exit code
+    /// for history and notifications; the window stays open. Built by <see cref="WindowHost.Args"/>.</summary>
     public static string WindowArgs(PythonInfo py, string scriptPath, string? userArgs, string? expectedHash, string doneFile, string? logFile = null)
     {
         string dir = System.IO.Path.GetDirectoryName(scriptPath) ?? "";

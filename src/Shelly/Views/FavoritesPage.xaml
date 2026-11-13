@@ -41,7 +41,7 @@
                                         </Border>
                                         <Image Source="{Binding Icon}" Width="{DynamicResource FavTileImage}" Height="{DynamicResource FavTileImage}" Visibility="{Binding HasIcon, Converter={StaticResource BoolVis}}" />
                                     </Grid>
-                                    <!-- 1.2.0: on a schedule -->
+                                    <!-- Schedule indicator -->
                                     <Border DockPanel.Dock="Right" Background="Transparent" ToolTip="{Binding ScheduleTip}" Margin="4,0,0,0" VerticalAlignment="Center"
                                             Visibility="{Binding HasSchedule, Converter={StaticResource BoolVis}}">
                                         <TextBlock Style="{StaticResource Glyph}" Text="&#xE121;" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />

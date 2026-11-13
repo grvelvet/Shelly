@@ -22,9 +22,9 @@ public sealed class RunSession : INotifyPropertyChanged
     public int LineCount;
     public bool IsInline => Runner != null;
     public bool Ended { get; set; }
-    /// <summary>Window runs (1.2.0): the file the window writes the exit code to when the script ends (the window stays open).</summary>
+    /// <summary>Window runs: the file the window writes the exit code to when the script ends (the window stays open).</summary>
     public string? DoneFile { get; init; }
-    /// <summary>Window runs (1.4.0): the transcript log file while the script runs.</summary>
+    /// <summary>Window runs: the transcript log file while the script runs.</summary>
     public string? LogFile { get; init; }
     public string WindowOutput { get; internal set; } = "";
     public string ElapsedText => RunResult.FormatElapsed((DateTime.Now - Started).TotalSeconds);
@@ -121,7 +121,7 @@ public sealed class RunManager
     /// <summary>The file changed between the check (analysis, dialogs, trust) and the start.</summary>
     sealed class ScriptChangedException : Exception { }
 
-    /// <summary>What RunPlanner reads (1.3.1).</summary>
+    /// <summary>Environment adapter passed to RunPlanner.</summary>
     IRunEnvironment Env => env ??= new AppRunEnvironment(state, InlineRunning);
     IRunEnvironment? env;
     readonly Prompts prompts;
@@ -151,7 +151,7 @@ public sealed class RunManager
         }
         // The file may have changed since the list was scanned
         f = state.Find(f.Rel) is { } fresh && File.Exists(fresh.Path) ? fresh : f;
-        // Every check and question is RunPlanner's (shared with scheduled runs since 1.3.1)
+        // Validate and plan the run via RunPlanner
         var r = await RunPlanner.PlanInteractiveAsync(Env, prompts, f, o);
         if (r.Status == PlanStatus.Changed) throw new ScriptChangedException();
         if (r.Plan is not { } p) return;
@@ -308,7 +308,7 @@ public sealed class RunManager
         App.HistoryChanged();
     }
 
-    /// <summary>The history file; a failure is shown (1.3.1: also after window runs, which ignored it).</summary>
+    /// <summary>Saves the history file and reports any write failure to the status bar.</summary>
     void SaveHistory()
     {
         if (!state.History.Save() && state.History.LastError != null) App.Status(Loc.F("histSaveFail", state.History.LastError), true);
@@ -414,7 +414,7 @@ public sealed class RunManager
         return Path.Combine(dir, entryId + ".exit");
     }
 
-    /// <summary>The transcript log file of a window run (1.4.0).</summary>
+    /// <summary>The transcript log file of a window run.</summary>
     public static string LogFileFor(AppPaths paths, string entryId)
     {
         string dir = Path.Combine(paths.CacheDir, "runs");

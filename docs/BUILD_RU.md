@@ -21,10 +21,10 @@
 .\build.ps1 publish              # artifacts\publish\fd и artifacts\publish\sc
 .\build.ps1 publish -Flavor fd   # только малая сборка
 .\build.ps1 pack                 # zip и SHA256SUMS.txt в artifacts\dist
-.\build.ps1 local                # Shelly.exe в корень репозитория, рядом со Scripts
+.\build.ps1 local                # Shelly.exe и Shelly-selfcontained.exe в корень репозитория, рядом со Scripts
 .\build.ps1 clean                # удалить artifacts\ (и bin\, obj\, publish\ старой раскладки)
 .\build.ps1 clean all            # с нуля
-.\build.ps1 pack -Version v1.4.1 # как в Release для тега v1.4.1
+.\build.ps1 pack -Version v1.5.0 # как в Release для тега v1.5.0
 ```
 
 Если PowerShell запрещает скрипты: `powershell -ExecutionPolicy Bypass -File .\build.ps1` или `build.bat`.
@@ -52,10 +52,10 @@
 
 Одно место: `VersionPrefix` в `Directory.Build.props`.
 
-- Локальная сборка и CI: `1.4.1-dev` (в свойствах exe `1.4.1-dev+<коммит>`), zip `shelly-1.4.1-dev.zip`.
-- Релиз: `-Version v1.4.1` (тег). Версия тега должна совпасть с `VersionPrefix`, иначе сборка падает. Суффикс
-  тега (`v1.4.1-beta.1`) становится меткой предрелиза.
-- В окне Shelly и при проверке обновлений версия `1.4.1`: `AssemblyVersion` всегда `X.Y.Z.0`.
+- Локальная сборка и CI: `1.5.0-dev` (в свойствах exe `1.5.0-dev+<коммит>`), zip `shelly-1.5.0-dev.zip`.
+- Релиз: `-Version v1.5.0` (тег). Версия тега должна совпасть с `VersionPrefix`, иначе сборка падает. Суффикс
+  тега (`v1.5.0-beta.1`) становится меткой предрелиза.
+- В окне Shelly и при проверке обновлений версия `1.5.0`: `AssemblyVersion` всегда `X.Y.Z.0`.
 
 ## Релиз
 
@@ -65,15 +65,15 @@
 
    ```powershell
    git switch main; git pull
-   git tag v1.3.2
-   git push origin v1.3.2
+   git tag v1.5.0
+   git push origin v1.5.0
    ```
 
 4. Release (`.github/workflows/release.yml`) проверяет, что тег на `main`, собирает, тестирует, упаковывает и
    публикует релиз: оба zip и `SHA256SUMS.txt`, текст — раздел CHANGELOG и сгенерированный GitHub список PR.
-   Тег с `-` (`v1.4.1-rc.1`) публикуется как предрелиз.
+   Тег с `-` (`v1.5.0-rc.1`) публикуется как предрелиз.
 
-Если Release упал: исправить в `main`, удалить тег (`git push origin :refs/tags/v1.3.2`, `git tag -d v1.3.2`)
+Если Release упал: исправить в `main`, удалить тег (`git push origin :refs/tags/v1.5.0`, `git tag -d v1.5.0`)
 и поставить заново.
 
 ## Зависимости

@@ -1,6 +1,6 @@
 namespace Shelly.Core;
 
-/// <summary>Outside links shown in the app (1.1.2). One place for each URL.</summary>
+/// <summary>Outside links shown in the app. One place for each URL.</summary>
 public static class Links
 {
     /// <summary>Donations (Boosty). Shown in Settings > About and in the mascot window; never as a pop-up.</summary>

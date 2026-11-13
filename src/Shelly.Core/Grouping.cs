@@ -123,7 +123,7 @@ public static class ScriptOrder
     }
 }
 
-/// <summary>Order of the Favorites page (1.1.2). The input is in the manual order (Settings.Favorites); every key is
+/// <summary>Order of the Favorites page. The input is in the manual order (Settings.Favorites); every key is
 /// stable and breaks ties by name (culture-aware, so Cyrillic sorts as in Windows), then by the manual order.</summary>
 public static class FavoriteOrder
 {
@@ -178,9 +178,9 @@ public static class ScriptHeader
     public const string DefaultGlyph = "\uE756";
     /// <summary>Default glyph of a Python script (Code), so .py and .ps1 rows look different at a glance.</summary>
     public const string PythonGlyph = "\uE943";
-    /// <summary>Default glyph of a batch file (Command prompt, 1.3.0).</summary>
+    /// <summary>Default glyph of a batch file (Command prompt).</summary>
     public const string BatchGlyph = "\uE9F5";
-    /// <summary>Default glyph of a custom interpreter's script (1.3.0).</summary>
+    /// <summary>Default glyph of a custom interpreter's script.</summary>
     public const string CustomGlyph = "\uEA86";
 
     /// <summary>The default glyph of a language.</summary>
@@ -190,7 +190,7 @@ public static class ScriptHeader
     };
 
     /// <summary>The leading comments of a batch file (rem, ::) or a custom interpreter's script (#, //, --, ;, ', rem, ::)
-    /// as "#" lines, so the directives read the same in every language (1.3.0).</summary>
+    /// as "#" lines, so the directives read the same in every language.</summary>
     public static string HeaderText(string text, string lang)
     {
         if (lang is ScriptLangs.PowerShell or ScriptLangs.Python) return text;

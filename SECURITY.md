@@ -6,8 +6,8 @@ Security fixes go into the latest release of the .NET edition only. Please updat
 
 | Version | Supported |
 |---|---|
-| 1.4.2 (latest) | yes |
-| < 1.4.2 | no |
+| 1.5.0 (latest) | yes |
+| < 1.5.0 | no |
 
 ## Reporting a vulnerability
 
@@ -44,7 +44,7 @@ corpus in `tests/Shelly.Core.Tests/TestData/Safety`), or SmartScreen warnings ab
   It resolves aliases, constant variables, string tricks and splatting, and flags code it can't see (dynamic
   invocation, encoded commands, reflection, download-and-run) as danger. It can't know what a URL serves, what a script
   reads or downloads at run time, or what programs it starts do; it can miss things and it can raise false alarms.
-  Danger findings ask before every run and can't be trusted; warnings can be trusted per file version (path + SHA-256).
+  Danger findings ask once per file version (path + SHA-256) and re-prompt if the file changes; warnings can also be trusted per file version.
   Administrator runs always ask.
 - **Batch files and custom interpreters (1.3.0).** Batch files get a basic check of known dangerous commands; it does
   not expand variables and can miss more than the PowerShell check. Scripts of custom interpreters are not checked at

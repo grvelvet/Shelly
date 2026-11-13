@@ -34,7 +34,7 @@ public partial class App : Application
         Perf.FilePath = Path.Combine(paths.CacheDir, "perf.log");
         DispatcherUnhandledException += OnUnhandled;
         AppDomain.CurrentDomain.UnhandledException += (_, ev) => AppLog.Write("! fatal: " + ev.ExceptionObject);
-        // A task nobody awaited (fire and forget) failed: logged instead of lost (1.3.1)
+        // Log unobserved task exceptions instead of losing them
         TaskScheduler.UnobservedTaskException += (_, ev) => { AppLog.Error("task", ev.Exception); ev.SetObserved(); };
 
         // A scheduled run (Task Scheduler) or --run --headless: handed to the running Shelly of this folder, else run here
@@ -199,7 +199,7 @@ public partial class App : Application
 
     public static void Status(string text, bool important = false) => StatusChanged?.Invoke(text, important);
 
-    /// <summary>An exception of an action nobody waits for: logged and shown in the status bar (1.3.1).</summary>
+    /// <summary>An exception of an action nobody waits for: logged and shown in the status bar.</summary>
     public static void Fail(string where, Exception ex)
     {
         AppLog.Error(where, ex);

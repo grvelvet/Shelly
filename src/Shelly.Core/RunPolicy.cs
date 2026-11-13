@@ -3,19 +3,19 @@ using System.Text.Json;
 
 namespace Shelly.Core;
 
-/// <summary>Which mode a run uses (1.2.0).</summary>
+/// <summary>Which mode a run uses.</summary>
 public static class RunModes
 {
     public const string Inline = "inline", Window = "window", Admin = "admin", Gui = "gui", Hidden = "hidden";
-    /// <summary>The choices of Settings > Running > Default run mode ("window" is the default since 1.2.0).</summary>
+    /// <summary>The choices of Settings > Running > Default run mode.</summary>
     public static readonly string[] Defaults = { "window", "inline" };
     public const string DefaultMode = "window";
 
     /// <summary>requested: the mode the user picked for this run (menu item, Run settings, re-run) — always wins.
     /// For runs from the list, the favorites and the jump list the script's own choice comes next: the remembered mode
-    /// (Run settings > Remember) before the <c># Shelly-Mode:</c> header. Everything else gets the global default
-    /// (before 1.2.0 that fallback was always inline). Save and Run in the editor stays inline: it is the edit-and-try
-    /// loop, and the editor brings the output in Shelly's window to the front.</summary>
+    /// (Run settings > Remember) before the <c># Shelly-Mode:</c> header. Everything else gets the global default.
+    /// Save and Run in the editor stays inline: it is the edit-and-try loop, and the editor brings the output in Shelly's
+    /// window to the front.</summary>
     public static string Resolve(string? requested, string origin, string? remembered, string? header, string defaultMode)
     {
         if (requested is "inline" or "window" or "admin" or "gui" or "hidden") return requested;
@@ -29,7 +29,7 @@ public static class RunModes
     }
 }
 
-/// <summary>When a finished run shows a notification (1.2.0).</summary>
+/// <summary>When a finished run shows a notification.</summary>
 public static class Notifications
 {
     /// <summary>Settings > Running > Notifications.</summary>
@@ -96,12 +96,12 @@ public static class ScheduleGate
         return null;
     }
 
-    /// <summary>Administrator scripts can't be scheduled (1.2.0): a task with "highest privileges" would need an elevated
+    /// <summary>Administrator scripts can't be scheduled: a task with "highest privileges" would need an elevated
     /// Shelly to create it and would then run elevated with no UAC prompt at all. The safer and simpler rule is no.</summary>
     public static bool CanSchedule(string? explicitMode, bool requiresElevation) => explicitMode != "admin" && !requiresElevation;
 }
 
-/// <summary>Named sets of parameter values per script (1.2.0), launcher-settings.json "paramPresets": one compact JSON
+/// <summary>Named sets of parameter values per script, launcher-settings.json "paramPresets": one compact JSON
 /// line each {"rel":…,"name":…,"values":{…}}. PowerShell scripts keep their param() values by name; Python scripts keep
 /// the free-text arguments under <see cref="PythonRun.ArgsKey"/>. Plain JSON, not encrypted: not for passwords.</summary>
 public sealed class ParamPreset
@@ -252,7 +252,7 @@ public static class Presets
     }
 }
 
-/// <summary>Shelly's command line (1.2.0 moved it to Core so it is tested):
+/// <summary>Shelly's command line:
 /// --run &lt;script&gt; [--preset &lt;name&gt;] [--headless] · --scheduled &lt;id&gt; · --history &lt;run id&gt; · --minimized · --show.
 /// &lt;script&gt; is the path relative to the Scripts folder (as in the jump list). --run alone runs the script like a
 /// click in the list; with --headless it runs unattended (hidden, output to the history, no dialogs), which is what a

@@ -161,18 +161,12 @@
                                 <TextBlock Style="{StaticResource Glyph}" Text="&#xE8B7;" FontSize="11"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             </Border>
-                            <!-- favorite star moved before Name -->
-
-
-                            <!-- 1.2.0: on a schedule -->
+                            <!-- Schedule indicator -->
                             <Border Background="Transparent" ToolTip="{Binding ScheduleTip}" Margin="6,1,0,0"
                                     Visibility="{Binding HasSchedule, Converter={StaticResource BoolVis}}">
                                 <TextBlock Style="{StaticResource Glyph}" Text="&#xE121;" FontSize="11"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             </Border>
-                            <!-- 1.4.0: Binding IsTrusted / Binding TrustedLabel moved to green shield in StatusTemplate -->
-
-
 
                             <Border Visibility="Collapsed" ToolTip="{Binding TrustedLabel}" Tag="{Binding IsTrusted}">
                             </Border>
@@ -226,18 +220,12 @@
                                 <TextBlock Style="{StaticResource Glyph}" Text="&#xE8B7;" FontSize="11"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             </Border>
-                            <!-- favorite star moved before Name -->
-
-
-                            <!-- 1.2.0: on a schedule -->
+                            <!-- Schedule indicator -->
                             <Border Background="Transparent" ToolTip="{Binding ScheduleTip}" Margin="6,1,0,0"
                                     Visibility="{Binding HasSchedule, Converter={StaticResource BoolVis}}">
                                 <TextBlock Style="{StaticResource Glyph}" Text="&#xE121;" FontSize="11"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             </Border>
-                            <!-- 1.4.0: Binding IsTrusted / Binding TrustedLabel moved to green shield in StatusTemplate -->
-
-
 
                             <Border Visibility="Collapsed" ToolTip="{Binding TrustedLabel}" Tag="{Binding IsTrusted}">
                             </Border>

@@ -19,7 +19,7 @@ public static class UpdateChecker
         return await GetLatestAsync(own, repo, ct);
     }
 
-    /// <summary>The User-Agent GitHub asks for: Shelly and its version (1.3.1; it was a fixed "1.0").</summary>
+    /// <summary>The User-Agent sent to GitHub: Shelly and its assembly version.</summary>
     public static readonly string UserAgentVersion = AppVersion();
 
     static string AppVersion()

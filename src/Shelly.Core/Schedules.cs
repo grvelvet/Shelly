@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace Shelly.Core;
 
-/// <summary>A script run on a schedule (1.2.0). The definitions live in launcher-settings.json ("schedules", one compact
+/// <summary>A script run on a schedule. The definitions live in launcher-settings.json ("schedules", one compact
 /// JSON line each) and are the source of truth; Windows Task Scheduler holds one task per schedule (\Shelly\…) that starts
 /// "Shelly.exe --scheduled &lt;id&gt;". The task refers to the schedule by id, so renaming the script or the preset does not
 /// touch the task.</summary>

@@ -9,9 +9,8 @@
   </PropertyGroup>
 
   <!-- Version: the one number to change for a release is VersionPrefix. A release (build.ps1 -Version from the v* tag,
-       which must match it) has no suffix; every other build is "1.4.0-dev" with the commit after "+" in the product
-       version. Assembly and file versions are always the plain number (1.4.0.0): the About box and the update check
-       read the assembly version. -->
+       which must match it) has no suffix; every other build is "<VersionPrefix>-dev" with the commit after "+" in the
+       product version. Assembly and file versions are always X.Y.Z.0: the About box and update check read them. -->
   <PropertyGroup>
     <VersionPrefix>1.5.0</VersionPrefix>
     <VersionSuffix Condition="'$(ShellyRelease)' != 'true' and '$(VersionSuffix)' == ''">dev</VersionSuffix>
@@ -33,8 +32,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <!-- 1.3.1: a clean build stays clean. The code style rules of .editorconfig (unused usings, members, parameters,
-         disposal) run in the build; IDE0005 needs the documentation file, which is not published. -->
+    <!-- The code style rules of .editorconfig (unused usings, members, parameters, disposal) run in the build;
+         IDE0005 needs the documentation file, which is not published. -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- A new advisory for a package (NuGet audit) is a warning, not a failed release build on the day it is published:
          Dependabot opens the update. -->

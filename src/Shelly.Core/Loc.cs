@@ -170,7 +170,7 @@ public static class Loc
         ("rsLastEntry", "Last run {0}", "Последний запуск {0}"),
         ("rsModeTip", "Runs inline by default. Administrator mode always opens a separate window.", "По умолчанию вывод отображается внутри Shelly. Права администратора открывают отдельное окно."),
         ("rsRequired", "Required", "Обязательный"),
-        // 1.0.10: header toolbar (sort, collapse/expand all, view, filter)
+        // Header toolbar (sort, collapse/expand all, view, filter)
         ("sortTip", "Sort: {0}", "Сортировка: {0}"),
         ("sortName", "Name", "Имя"),
         ("sortModified", "Date modified", "Дата изменения"),
@@ -277,7 +277,7 @@ public static class Loc
         ("discExit", "Exit", "Выйти"),
         ("logRunError", "Script error: {0}  ·  exit code {1}", "Ошибка скрипта: {0}  ·  код выхода {1}"),
         ("logRunWindow", "Ran in a separate window.", "Выполнялся в отдельном окне."),
-        // 1.1.2: Favorites sort
+        // Favorites sort
         ("favSortManual", "Manual", "Вручную"),
         ("favSortName", "By name", "По имени"),
         ("favSortLastRun", "By last run", "По последнему запуску"),

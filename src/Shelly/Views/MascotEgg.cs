@@ -8,7 +8,7 @@ using Shelly.Services;
 
 namespace Shelly.Views;
 
-/// <summary>1.1.2: a small secret. A triple click on the About icon in Settings shows the Shelly mascot with a random
+/// <summary>Easter egg. A triple click on the About icon in Settings shows the Shelly mascot with a random
 /// caption. The image is loaded only here, when the window opens.</summary>
 public static class MascotEgg
 {

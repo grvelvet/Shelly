@@ -21,10 +21,10 @@ public static class Layout
     /// <summary>The view buttons move into "…" when the search box would get narrower than this.</summary>
     public const double SearchOverflowAt = 200;
 
-    /// <summary>1.1.2: gap left between list content and the vertical scroll bar.</summary>
+    /// <summary>Gap left between list content and the vertical scroll bar.</summary>
     public const double ScrollGutterGap = 4;
 
-    /// <summary>1.1.2: right padding a ScrollViewer needs so its content does not run under an overlay scroll bar (the
+    /// <summary>Right padding a ScrollViewer needs so its content does not run under an overlay scroll bar (the
     /// WPF Fluent ScrollViewer draws the bar over the content). contentRight: right edge of the content without that
     /// padding; barLeft: left edge of the visible bar (both in the ScrollViewer's coordinates). The overlap rounded up
     /// plus <see cref="ScrollGutterGap"/>, or 0 when they do not overlap (a classic bar in its own column).</summary>
@@ -34,7 +34,7 @@ public static class Layout
         return o > 0.5 ? Math.Ceiling(o) + ScrollGutterGap : 0;
     }
 
-    /// <summary>1.1.2: one Favorites tile size. Spacing stays on the 4 px scale; Medium is the size before 1.1.2.</summary>
+    /// <summary>One Favorites tile size. Spacing stays on the 4 px scale.</summary>
     public sealed record FavoriteTile(string Key, double Width, double Height, Thickness4 Padding, double Icon, double Glyph,
         double Image, double IconGap, double NameSize, double DescSize, double DescGap);
 

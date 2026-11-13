@@ -104,12 +104,12 @@ public sealed class ScriptRow : RowBase
     bool fav;
     public bool IsFavorite { get => fav; set => Set(ref fav, value); }
     bool scheduled;
-    /// <summary>1.2.0: the script has a schedule (a clock after the name; the tooltip lists them).</summary>
+    /// <summary>The script has a schedule (a clock after the name; the tooltip lists them).</summary>
     public bool HasSchedule { get => scheduled; set => Set(ref scheduled, value); }
     string scheduleTip = "";
     public string ScheduleTip { get => scheduleTip; set => Set(ref scheduleTip, value); }
     bool trusted;
-    /// <summary>1.4.0: this version of the script is in the user's trusted list.</summary>
+    /// <summary>This version of the script is in the user's trusted list.</summary>
     public bool IsTrusted { get => trusted; set => Set(ref trusted, value); }
     public string TrustedLabel => Loc.T("rowTrustedBadge");
     public string TrustedTip => Loc.T("rowTrustedTip");

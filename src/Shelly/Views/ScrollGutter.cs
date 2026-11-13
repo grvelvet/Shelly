@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace Shelly.Views;
 
-/// <summary>1.1.2: keeps list content out from under the vertical scroll bar. The WPF Fluent ScrollViewer template lets
+/// <summary>Keeps list content out from under the vertical scroll bar. The WPF Fluent ScrollViewer template lets
 /// the ScrollContentPresenter span both grid columns, so the 12 px scroll bar is drawn over the right edge of the content
 /// (and widens its track on hover). Card borders, the selection border and the keyboard focus ring of the rightmost
 /// items ended under the bar. ScrollGutter.Enabled adds right padding to the ScrollViewer while (and only while) the
@@ -87,7 +87,7 @@ public static class ScrollGutter
     }
 }
 
-/// <summary>1.4.2: Windows 11 in-place ComboBox flyout placement and bounds validation (width, height, screen position).</summary>
+/// <summary>Windows 11 in-place ComboBox flyout placement and bounds validation (width, height, screen position).</summary>
 public static class ComboPopup
 {
     public static readonly DependencyProperty EnabledProperty = DependencyProperty.RegisterAttached(

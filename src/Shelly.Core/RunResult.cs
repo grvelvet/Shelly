@@ -3,7 +3,7 @@ using System.Globalization;
 namespace Shelly.Core;
 
 /// <summary>Results for people: Success / Failed (code N) / Stopped / Window closed / Crashed (...), with the raw code in a tip.</summary>
-/// <summary>RunEntry.Kind and LastRun.Kind (1.3.1: named; the values are the ones in existing history files).</summary>
+/// <summary>RunEntry.Kind and LastRun.Kind values.</summary>
 public static class RunKinds
 {
     public const string Running = "running", Ok = "ok", Fail = "fail", Stopped = "stopped", Closed = "closed", Started = "started";

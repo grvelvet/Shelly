@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Shelly.Core;
 
-/// <summary>1.4.0: Strips PowerShell Start-Transcript / Stop-Transcript header and footer blocks from captured window logs.</summary>
+/// <summary>Strips PowerShell Start-Transcript / Stop-Transcript header and footer blocks from captured window logs.</summary>
 public static class TranscriptCleaner
 {
     public const string Separator = "**********************";

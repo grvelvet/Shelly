@@ -25,7 +25,7 @@
 .EXAMPLE
     .\build.ps1 local                # Shelly.exe next to Scripts, for trying it out
 .EXAMPLE
-    .\build.ps1 pack -Version v1.3.1 # what the Release workflow runs for the tag v1.3.1
+    .\build.ps1 pack -Version v1.5.0 # what the Release workflow runs for the tag v1.5.0
 #>
 [CmdletBinding()]
 param(
@@ -225,7 +225,7 @@ function Get-Sha256([string] $path) {
 }
 
 function Write-ReleaseNotes([string] $label) {
-    # The CHANGELOG section of this version ("## [1.3.1] - date" up to the next "## ["): the body of the GitHub release
+    # The CHANGELOG section of this version ("## [X.Y.Z] - date" up to the next "## ["): the body of the GitHub release
     $notes = Join-Path $Artifacts 'release-notes.md'
     if (Test-Path $notes) { Remove-Item -Force $notes }
     $number = ($label -split '-', 2)[0]

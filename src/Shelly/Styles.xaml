@@ -620,7 +620,7 @@
         <Setter Property="FontSize" Value="12" />
     </Style>
 
-    <!-- ===== Windows 11 ComboBox & ComboBoxItem (1.4.1) =====
+    <!-- ===== Windows 11 ComboBox & ComboBoxItem =====
          Consistent 4 px rounded button, 8 px rounded flyout popup with soft shadow and 4 px inner padding,
          and 4 px rounded items with an accent selection pill (no mixed sharp/rounded popup corners). -->
     <Style x:Key="ComboBoxToggleButton" TargetType="ToggleButton">

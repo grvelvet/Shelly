@@ -35,7 +35,6 @@ public sealed class Settings
     public bool PwshOfferDismissed;
     public string LastVersion = "";
     public List<string> RunPresets = new();
-    // New in 1.0
     public List<string> ScriptIcons = new();      // "Folder\Name.ps1|assets\script-icons\xxx.png" (icon path relative to the Shelly folder)
     public string ToastAfterSec = "20";
     public bool UpdateCheck = true;
@@ -47,7 +46,6 @@ public sealed class Settings
     public bool ListSortDesc;
     /// <summary>Script list view: cards | compact.</summary>
     public string ListView = "cards";
-    // New in 1.0.11
     /// <summary>Remote sources the user trusts for download-and-run one-liners: "host" or "host/path-prefix" (HTTPS only).</summary>
     public List<string> TrustedSources = new();
     /// <summary>Built-in trusted sources the user turned off.</summary>
@@ -56,22 +54,19 @@ public sealed class Settings
     public string DisclaimerAccepted = "";
     /// <summary>Script folders outside Scripts (full paths, see <see cref="ExternalScripts"/>).</summary>
     public List<string> ExternalFolders = new();
-    // New in 1.1.0
     /// <summary>python.exe for .py scripts; empty = find it (py launcher, PATH, usual install folders).</summary>
     public string PythonPath = "";
-    // New in 1.3.0
     /// <summary>Custom interpreters (Settings > Environment): one JSON line each, see <see cref="CustomInterpreter"/>.</summary>
     public List<string> CustomInterpreters = new();
-    /// <summary>Run .py scripts with the .venv / venv / env found next to them (1.1.1; on by default, missing key = on).</summary>
+    /// <summary>Run .py scripts with the .venv / venv / env found next to them (on by default, missing key = on).</summary>
     public bool UseVenv = true;
-    /// <summary>Order of the Favorites page (1.1.2): manual (the order they were added, or moved by hand; the default,
-    /// as before) | name | lastrun | runcount | type.</summary>
+    /// <summary>Order of the Favorites page: manual (the order they were added, or moved by hand; default) |
+    /// name | lastrun | runcount | type.</summary>
     public string FavoritesSort = "manual";
-    /// <summary>Favorites tile size (1.1.2): small | medium | large (Layout.FavoriteTiles); medium is the size before 1.1.2.</summary>
+    /// <summary>Favorites tile size: small | medium | large (Layout.FavoriteTiles).</summary>
     public string FavoritesSize = "medium";
-    // New in 1.2.0
     /// <summary>Mode of runs that don't ask for one (no remembered mode, no <c># Shelly-Mode:</c> header): window | inline.
-    /// Missing key = window, the 1.2.0 default (it was always inline before).</summary>
+    /// Missing key = window.</summary>
     public string DefaultMode = RunModes.DefaultMode;
     /// <summary>Notifications when a run finishes: off | errors | always. Missing key: from toastOnFinish (off when that was off).</summary>
     public string Notify = "always";
@@ -79,7 +74,6 @@ public sealed class Settings
     public List<string> ParamPresets = new();
     /// <summary>Schedules (<see cref="Schedule"/>), one JSON line each; the source of truth for the Task Scheduler tasks.</summary>
     public List<string> Schedules = new();
-    // New in 1.4.0
     /// <summary>Default editor for Edit (Ctrl+E / context menu): builtin | external.</summary>
     public string DefaultEditor = "builtin";
     /// <summary>External editor choice: auto | vscode | notepadpp | ise | notepad | custom.</summary>
@@ -112,7 +106,7 @@ public sealed class Settings
 
     public static readonly string[] SortChoices = { "name", "modified", "lastrun", "runcount" };
     public static readonly string[] FavoritesSortChoices = { "manual", "name", "lastrun", "runcount", "type" };
-    /// <summary>"Only if longer than": 0 = any length (1.2.0).</summary>
+    /// <summary>"Only if longer than": 0 = any length.</summary>
     public static readonly int[] ToastAfterChoices = { 0, 10, 20, 30, 60 };
 
     public static readonly int[] HistoryMaxChoices = { 50, 100, 200 };
@@ -152,7 +146,7 @@ public sealed class Settings
         using var doc = JsonDocument.Parse(text, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
         if (doc.RootElement.ValueKind != JsonValueKind.Object) return;
         bool notifySeen = false;
-        bool legacyToast = true;   // toastOnFinish of a file from before 1.2.0 (read only, for the migration below)
+        bool legacyToast = true;   // legacy toastOnFinish flag for migration below
         foreach (var p in doc.RootElement.EnumerateObject())
         {
             var v = p.Value;
@@ -213,7 +207,7 @@ public sealed class Settings
                 default: Unknown[p.Name] = v.Clone(); break;
             }
         }
-        // A file from before 1.2.0: notifications were one switch (toastOnFinish)
+        // Migrate legacy single-switch toastOnFinish setting
         if (!notifySeen) Notify = legacyToast ? "always" : "off";
         Validate();
     }

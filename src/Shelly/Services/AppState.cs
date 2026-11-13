@@ -266,7 +266,7 @@ public sealed class AppState : IDisposable
         foreach (var kv in LastRun.Import(Settings)) LastRuns[kv.Key] = kv.Value;
     }
 
-    /// <summary>An unattended run (1.2.0, no window): it never writes the settings file, which belongs to the Shelly that
+    /// <summary>An unattended run (no window): it never writes the settings file, which belongs to the Shelly that
     /// may be started meanwhile; its result goes to the history only.</summary>
     public bool ReadOnlySettings { get; set; }
 

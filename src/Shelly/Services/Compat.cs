@@ -12,7 +12,7 @@ public static class Compat
         var st = App.S;
         var list = new List<Item>();
         int build = SystemInfo.WindowsBuild;
-        // Windows 11 needs no row (1.1.1: the "full Windows 11 styling" line said nothing useful); older Windows still gets one
+        // Windows 11 needs no row; older Windows still gets a compatibility row
         if (build < 22000)
             list.Add(build >= 17763 ? new("win", Loc.T("cWin"), "info", Loc.F("cWin10", build))
                    : new("win", Loc.T("cWin"), "warn", Loc.F("cWinOld", build)));

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Shelly.Core;
 
-/// <summary>The script languages (1.3.0): PowerShell, Python, Batch (.bat / .cmd, run by cmd.exe) and the user's own
+/// <summary>The script languages: PowerShell, Python, Batch (.bat / .cmd, run by cmd.exe) and the user's own
 /// interpreters (Settings > Environment > Custom interpreters).</summary>
 public static class ScriptLangs
 {
@@ -31,7 +31,7 @@ public static class ScriptLangs
     }
 }
 
-/// <summary>A program the user added for a file extension (Settings > Environment > Custom interpreters, 1.3.0), kept in
+/// <summary>A program the user added for a file extension (Settings > Environment > Custom interpreters), kept in
 /// launcher-settings.json "customInterpreters" as one JSON line each. Nothing is detected or checked for safety: the user
 /// says which program runs which files and how.</summary>
 public sealed class CustomInterpreter
@@ -180,7 +180,7 @@ public static class CustomInterpreters
     }
 }
 
-/// <summary>How a script of a custom interpreter is started (1.3.0): the template is split into arguments like a
+/// <summary>How a script of a custom interpreter is started: the template is split into arguments like a
 /// Windows command line, then {script} / {dir} are put into their argument as one value (spaces in paths need no
 /// quotes) and a lone {args} becomes the Arguments box split into separate arguments. Every argument is quoted again
 /// for the program (CommandLineToArgvW rules), so nothing typed in the box can start another command. A .bat / .cmd
@@ -233,10 +233,10 @@ public static class CustomRun
     internal static string DirOf(string path) => path.LastIndexOfAny(new[] { '\\', '/' }) is var i and > 0 ? path.Substring(0, i) : "";
 }
 
-/// <summary>Batch files (.bat / .cmd, 1.3.0), run by cmd.exe: <c>cmd /d /s /c "chcp 65001 &gt;nul &amp; call "script" args"</c>.
+/// <summary>Batch files (.bat / .cmd), run by cmd.exe: <c>cmd /d /s /c "chcp 65001 &gt;nul &amp; call "script" args"</c>.
 /// /d skips the AutoRun commands of the registry, call returns the script's exit code (exit /b N, or the last
 /// %ERRORLEVEL%). A script saved as UTF-8 (or plain ASCII) runs with the UTF-8 code page, so Cyrillic text it prints comes
-/// out right; one saved in the old OEM code page runs as before (no chcp). Arguments go through cmd.exe: each one is quoted
+/// out right; one saved in the OEM code page runs without chcp. Arguments go through cmd.exe: each one is quoted
 /// when it has spaces or cmd characters (&amp; | &lt; &gt; ( ) = , ;); " % ^ can't be passed safely and are refused.</summary>
 public static class BatchRun
 {
@@ -316,7 +316,7 @@ public static class BatchRun
 /// <summary>The PowerShell console a batch or custom script runs in for a window run (like Python's): the working folder,
 /// a grey first line naming what runs it, the exit code at the end, the window stays open. With
 /// <paramref name="expectedHash"/> (administrator runs) the script starts only if the file still has that SHA-256 after
-/// the UAC prompt; <paramref name="doneFile"/> gets the exit code when the script ends (1.2.0 end marker).</summary>
+/// the UAC prompt; <paramref name="doneFile"/> gets the exit code when the script ends.</summary>
 public static class WindowHost
 {
     /// <summary>The start of every window run's command line (PowerShell scripts, Python, batch, custom interpreters).</summary>
@@ -338,7 +338,7 @@ public static class WindowHost
         return Prefix + Quoting.NativeArg(cmd);
     }
 
-    /// <summary>The one copy of the check after the UAC prompt (1.3.1; it was written out three times): with
+    /// <summary>Checks the script SHA-256 after the UAC prompt: with
     /// <paramref name="expectedHash"/> (SHA-256, hex) <paramref name="call"/> runs only if the file still has it, else a red
     /// line says why (and $sc=1 when <paramref name="setCode"/>: the end marker gets a failure). No valid hash: the call as it is.</summary>
     public static string HashGuard(string scriptPath, string? expectedHash, string call, bool setCode)
@@ -424,7 +424,7 @@ public sealed class LineSplitter
     byte[] Take() { var a = buf.ToArray(); buf.Clear(); return a; }
 }
 
-/// <summary>The leading comment lines of a script in any of Shelly's languages (1.3.0): "#" for PowerShell and Python,
+/// <summary>The leading comment lines of a script in any of Shelly's languages: "#" for PowerShell and Python,
 /// "rem" / "::" for batch files (after @echo off, setlocal or chcp), and #, //, --, ;, ', rem or :: for custom
 /// interpreters (after a #! line). Each comment comes back as "# text" so the directive and description rules are the same.</summary>
 public static class CommentHeader
@@ -465,7 +465,7 @@ public static class CommentHeader
     }
 }
 
-/// <summary>A light safety check of batch files (1.3.0), with the rules and severities of the PowerShell check: each
+/// <summary>A light safety check of batch files, with the rules and severities of the PowerShell check: each
 /// command of a line (split at &amp;, &amp;&amp;, ||, | and brackets, after if / for … do / call / start) is looked up like a
 /// native command in a PowerShell script: del / rd with /s /q (system folders are high), format, diskpart, reg delete,
 /// bcdedit, vssadmin delete shadows, cipher /w, takeown / icacls on system folders, shutdown, sc delete, net user,
@@ -577,7 +577,7 @@ public static class BatchScanner
     }
 }
 
-/// <summary>How a batch file or a custom interpreter's script is started (1.3.0), for interactive and scheduled runs alike.
+/// <summary>How a batch file or a custom interpreter's script is started, for interactive and scheduled runs alike.
 /// Window(expectedHash, doneFile) gives the PowerShell host's command line of a window run.</summary>
 public sealed record OtherRunPlan(
     string Engine, string Exe, string InlineArgs, string WorkDir, string Label,

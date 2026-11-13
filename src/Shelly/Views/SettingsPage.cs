@@ -17,7 +17,7 @@ public sealed class SettingsPage : UserControl, IPage
 {
     static AppState St => App.S;
 
-    /// <summary>1.1.2: one minimum width for every drop-down of this page (and the History filter), so the boxes line up
+    /// <summary>Minimum width for every drop-down of this page (and the History filter), so the boxes line up
     /// and do not change width with the selection. Sized for the longest item in English and Russian ("Use system setting",
     /// about 170 px with the Fluent padding and chevron); a longer text still widens the box instead of being cut.</summary>
     public const double ComboWidth = 148;
@@ -194,7 +194,7 @@ public sealed class SettingsPage : UserControl, IPage
         return t;
     }
 
-    // ---------- Schedules (1.2.0) ----------
+    // ---------- Schedules ----------
 
     /// <summary>All schedules: script, when, preset, next run, the state of its task; on/off, Run now, Edit, Delete.
     /// Rebuilt alone (not the whole page) when Task Scheduler was checked.</summary>
@@ -386,11 +386,11 @@ public sealed class SettingsPage : UserControl, IPage
 
         // Running
         Section(Loc.T("secRun"));
-        // 1.2.0: what a plain Run does for scripts without their own choice
+        // Default run mode for scripts without a per-script mode
         Card(Glyphs.Window, Loc.T("setDefaultMode"), Loc.T("setDefaultModeNote"),
             Combo(new[] { ("window", Loc.T("modeDefWindow")), ("inline", Loc.T("modeDefInline")) }, s.DefaultMode,
                 v => { s.DefaultMode = v; St.SaveSettings(); St.NotifyScriptsChanged(); }));
-        // Notifications (1.2.0: off / only errors / always; was an on/off switch) and the minimum run length
+        // Notifications and minimum run length threshold
         ComboBox? afterBox = null;
         Card(Glyphs.Bell, Loc.T("setNotify"), Loc.T("setNotifyNote"),
             Combo(new[] { ("off", Loc.T("notifyOff")), ("errors", Loc.T("notifyErrors")), ("always", Loc.T("notifyAlways")) }, s.Notify,
@@ -401,12 +401,12 @@ public sealed class SettingsPage : UserControl, IPage
         Card("\uE916", Loc.T("setToastAfter"), Loc.T("setToastAfterNote"), afterBox);
         Card(Glyphs.Pin, Loc.T("setJumpList"), Loc.T("setJumpListNote"), Toggle(s.JumpList, on => { s.JumpList = on; St.SaveSettings(); JumpLists.Update(); }));
 
-        // Schedules (1.2.0)
+        // Schedules
         Section(Loc.T("secSchedules"));
         body.Children.Add(schedHost);
         BuildSchedules();
 
-        // Environment (was "Engines"): the shell picker shows the settings of one shell (PowerShell or Python); it is a view, not a setting
+        // Environment: shell/interpreter settings view
         Section(Loc.T("setEngines"));
         if (!St.PythonChecked && !St.PythonSearching) Dispatcher.BeginInvoke(() => { if (!St.PythonChecked && !St.PythonSearching) _ = St.FindPythonAsync(); });
         var engHost = new StackPanel();
@@ -673,7 +673,7 @@ public sealed class SettingsPage : UserControl, IPage
 
     // ---------- PowerShell / Python ----------
 
-    /// <summary>PowerShell: the engine that "Auto" scripts get (behaviour unchanged since 1.0). 1.1.2: the items read
+    /// <summary>PowerShell: the engine that "Auto" scripts get. The items read
     /// System / PowerShell 5.1 / PowerShell 7+; the stored values stay "auto" / "5.1" / "7".</summary>
     void BuildPowerShell(Panel into)
     {
@@ -715,7 +715,7 @@ public sealed class SettingsPage : UserControl, IPage
             Toggle(s.UseVenv, on => { s.UseVenv = on; St.SaveSettings(); St.NotifyScriptsChanged(); }), null, into);
     }
 
-    /// <summary>Custom interpreters (1.3.0): one card per entry (name, extensions, program; red when the program is not
+    /// <summary>Custom interpreters: one card per entry (name, extensions, program; red when the program is not
     /// found) with Edit and Delete, then Add. Batch files need nothing here (cmd.exe), and nothing is detected or scanned:
     /// the note says so.</summary>
     void BuildCustom(Panel into)

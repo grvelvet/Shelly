@@ -16,7 +16,7 @@ public sealed class SingleInstance : IDisposable
 
     static string IdFor(string root) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(root.ToLowerInvariant() + "|" + Environment.UserName))).Substring(0, 16);
 
-    /// <summary>Is the Shelly of this folder running (1.2.0: an unattended run asks before it starts on its own)?</summary>
+    /// <summary>Returns whether a Shelly instance for this folder is already running.</summary>
     public static bool IsRunning(string root)
     {
         try

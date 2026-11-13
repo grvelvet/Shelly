@@ -76,9 +76,8 @@ public static class RunArgs
 
     /// <summary>Arguments for a separate window (and administrator runs, where the working folder would be System32).
     /// expectedHash (SHA-256, hex; administrator runs): the script runs only if the file still has it when PowerShell gets to
-    /// it, after the UAC prompt (<see cref="WindowHost.HashGuard"/>). The window stays open (-NoExit), and doneFile gets the
-    /// script's exit code when it ends (1.2.0), with the same rules as inline runs. 1.3.1: the older forms without an end
-    /// marker (-File, -Command without it) and the admin flag are gone; every window run has had a marker since 1.2.0.</summary>
+    /// it, after the UAC prompt (<see cref="WindowHost.HashGuard"/>). The window stays open (-NoExit) when keepOpen is true,
+    /// and doneFile gets the script's exit code when it ends, with the same rules as inline runs.</summary>
     public static string WindowArgs(string path, string argText, string? expectedHash, string doneFile, string? logFile = null, bool keepOpen = true)
     {
         string dir = System.IO.Path.GetDirectoryName(path) ?? "";

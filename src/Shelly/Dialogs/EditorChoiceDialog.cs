@@ -5,7 +5,7 @@ using Shelly.Services;
 
 namespace Shelly.Dialogs;
 
-/// <summary>Compact Windows 11 card-style dialog for choosing the default editor and the external editor program (1.4.0 / 1.4.1).</summary>
+/// <summary>Compact Windows 11 card-style dialog for choosing the default editor and the external editor program.</summary>
 public sealed class EditorChoiceDialog : DialogWindow
 {
     const double Row = 32, Gap = 8, ComboMinWidth = 190;

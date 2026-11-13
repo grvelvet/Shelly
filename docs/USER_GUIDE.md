@@ -1,4 +1,4 @@
-# Shelly 1.4.1 user guide
+# Shelly 1.5.0 user guide
 
 [Русская версия](USER_GUIDE_RU.md) · [README](../README.md) · [CHANGELOG](../CHANGELOG.md)
 
@@ -361,8 +361,8 @@ the history.
 
 ### Python scripts (.py)
 
-Shelly lists `.py` files (since 1.1.0) next to `.ps1` ones, in Scripts and in added folders. A Python row has the **PY** mark (red
-when no Python 3 was found; **venv** when it has a virtual environment) and a code icon.
+Shelly lists `.py` files (since 1.1.0) next to `.ps1` ones, in Scripts and in added folders. A Python row shows its `.py`
+extension (with a **venv** mark when it has a virtual environment) and a code icon.
 
 - **Interpreter.** Settings → Environment, *Runtime*: *Python*. One line shows what is used: `Python 3.12 · auto-detect`,
   `Python 3.13 · custom path`, *Python not found* or *Custom path unavailable*; the full path is in its tooltip.
@@ -393,8 +393,8 @@ when no Python 3 was found; **venv** when it has a virtual environment) and a co
 ### Batch files (.bat, .cmd)
 
 Since 1.3.0 Shelly lists and runs `.bat` and `.cmd` files in Scripts and in the added folders. There is nothing to set
-up: `cmd.exe` is part of Windows, so Settings → Environment has no section for them. The row mark is **BAT** or **CMD**
-(red when the file is saved as UTF-8 with a BOM: cmd.exe would fail on the first line).
+up: `cmd.exe` is part of Windows, so Settings → Environment has no section for them. The row shows the `.bat` or `.cmd`
+extension (and warns when the file is saved as UTF-8 with a BOM: cmd.exe would fail on the first line).
 
 - **How it runs.** `%ComSpec% /d /s /c "call "script.bat" args"` in the script's folder (`/d`: no AutoRun from the
   registry). The exit code is the one of `exit /b N` or the last `errorlevel`. Like other scripts it runs in a separate
@@ -483,7 +483,7 @@ area (`E000`–`F8FF`):
 - Code points are listed in Microsoft's "Segoe Fluent Icons font" documentation.
 - A picture you choose with **Change icon…** (`.ico` or `.png`) takes priority. It is copied to `assets\script-icons`.
 
-**Default run mode.** `# Shelly-Mode: inline`, `window` or `admin` in the leading comments sets how a double-click,
+**Default run mode.** `# Shelly-Mode: inline`, `window`, `admin`, `gui` or `hidden` in the leading comments sets how a double-click,
 Enter or the jump list runs the script, until you remember another mode in Run settings. Administrator runs still ask
 first and show the UAC prompt.
 
@@ -565,7 +565,7 @@ to 60 s for the check (scheduled runs too).
 
 | Level | Mark | What happens | Examples |
 |---|---|---|---|
-| **Danger** (red) | red shield | Asks before **every** run. Can't be trusted. | Deleting in system locations, drive roots, user profiles or HKLM; disk format/wipe/partition; `bcdedit`; shutdown/restart; `reg delete` in HKLM; execution policy Unrestricted/Bypass for good; weakening Defender; turning off the firewall; deleting services, shadow copies, backups or event logs; changing accounts or the Administrators group; ACL/ownership of system files; scheduled tasks as SYSTEM or with highest rights; **code that is built at run time** (see below); **downloading and running code** (also through `mshta`, `regsvr32`, `msiexec` or `certutil`) |
+| **Danger** (red) | red shield | Asks once per file version (path + SHA-256); re-prompts if modified. | Deleting in system locations, drive roots, user profiles or HKLM; disk format/wipe/partition; `bcdedit`; shutdown/restart; `reg delete` in HKLM; execution policy Unrestricted/Bypass for good; weakening Defender; turning off the firewall; deleting services, shadow copies, backups or event logs; changing accounts or the Administrators group; ACL/ownership of system files; scheduled tasks as SYSTEM or with highest rights; **code that is built at run time** (see below); **downloading and running code** (also through `mshta`, `regsvr32`, `msiexec` or `certutil`) |
 | **Warning** (amber) | amber shield | Asks before a run; "don't warn again" is allowed. | Deleting with `-Recurse` outside temp folders; deleting through .NET recursively; `Start-Process -Verb RunAs`; HKLM writes; scheduled tasks; compiling C# with `Add-Type` from text in the script; disabling a network adapter; session-only execution policy; adding a program to startup (a Run key); commands nested too deeply to read; a check that failed midway (**analysis error**) |
 | **Info** | none | Shown in the dialog, never asks. | `Remove-Item -Force` on a named item; deleting under `$env:TEMP` without `-Recurse`; calls of other local `.ps1` files; a base64 string that isn't run; downloads that aren't run; code from a **trusted source** |
 
@@ -658,17 +658,18 @@ Browsers, mail and chat programs mark downloaded files with an NTFS stream `Zone
 The **Safety check** dialog lists every finding with its level, line and code. **Open in editor** opens the script
 instead.
 
-- **Danger**: tick **I understand what this script does**; **Run** unlocks after 3 seconds. This happens on every run:
-  scripts with danger findings can't be marked as trusted.
-- **Warning**: **Don't warn again for this version of the script** trusts it by path + SHA-256 of the file; any change
-  brings the warning back. Manage the list in **Settings → Safety → Trusted scripts**.
+- **Danger**: tick **I understand what this script does**; **Run** unlocks after 3 seconds. Confirmation is remembered
+  per file version (path + SHA-256) and is requested again only if the file changes.
+- **Warning**: **Don't warn again for this version of the script** trusts it by path + SHA-256 of the file (shown as a
+  green shield in the script list); any change brings the warning back. Revoke trust via the row context menu
+  (**Remove from trusted**).
 - **Administrator** runs always ask, even when nothing was found, the script is trusted or warnings are off.
 - **Not verified** (no PowerShell could check the script): Shelly asks before running and shows the built-in scanner's
   findings.
 
 **Turning warnings off.** Settings → Safety → **Warn before running risky scripts**, or `>` in the omnibox (asks
-first). With warnings off, warnings are skipped; **danger findings, downloaded
-scripts and administrator runs are still checked on every run**. The marks stay in the list.
+first). With warnings off, safety prompts are skipped; **downloaded scripts and administrator runs are still checked on
+every run**. The marks stay in the list.
 
 ### Limits
 
@@ -873,7 +874,7 @@ unsigned scripts, Windows blocks them. Settings → Compatibility shows the poli
 **Unblock** in the dialog that opens when you run it (see [section 6](#6-safety-checks)).
 
 **Windows SmartScreen says "Windows protected your PC" / unknown publisher.** `Shelly.exe` isn't code-signed. Check
-the SHA-256 of the zip against `SHA256SUMS.txt` from the release (`Get-FileHash .\shelly-1.1.2.zip`), then click
+the SHA-256 of the zip against `SHA256SUMS.txt` from the release (`Get-FileHash .\shelly-1.5.0.zip`), then click
 **More info → Run anyway**.
 
 **Shelly doesn't start: ".NET is missing".** Install the .NET 10 Desktop Runtime (x64), or use the self-contained build.

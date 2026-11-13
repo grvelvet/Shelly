@@ -27,7 +27,7 @@ Use the small build. If the runtime is missing, Windows shows a download link, o
 **Check the file.** Each release has `SHA256SUMS.txt`.
 
 ```powershell
-Get-FileHash .\shelly-1.4.1.zip -Algorithm SHA256
+Get-FileHash .\shelly-1.5.0.zip -Algorithm SHA256
 ```
 
 `Shelly.exe` is not code-signed. SmartScreen may warn. After the checksum matches: **More info → Run anyway**. If the browser marked the zip, unblock it first: `Unblock-File .\shelly-1.x.x.zip`.
@@ -37,14 +37,14 @@ Get-FileHash .\shelly-1.4.1.zip -Algorithm SHA256
 - Searchable list of every `.ps1`, `.py`, `.bat` and `.cmd` in `Scripts`, with folders, favorites and filters.
 - Extra script folders from anywhere on disk (Settings → Folders and files): the scripts run in place.
 - Windows PowerShell 5.1 or PowerShell 7. Auto picks the engine, or you pin it.
-- Python 3 scripts (`.py`) next to PowerShell ones, marked **PY** in the list (see [Python scripts](#python-scripts)).
+- Python 3 scripts (`.py`) next to PowerShell ones (see [Python scripts](#python-scripts)).
 - Batch files (`.bat`, `.cmd`) built in, and custom interpreters for any other extension (`.js` → node…), see
   [Batch files and custom interpreters](#batch-files-and-custom-interpreters).
 - Reads `param()` and shows a dialog.
 - Safety check on PowerShell's AST. A guardrail, not a sandbox.
 - Blocks scripts marked as downloaded until you unblock them.
 - Output, history, tray, hotkey (Ctrl+Alt+L), jump list.
-- Runs in a separate window by default (or inline output, in Settings) while still capturing the full console output to
+- Runs in a separate window by default (or inline, GUI, or hidden modes) while still capturing the full console output to
   History and the output panel; notifications with the result and the exit code, a click opens the run in History.
 - Schedules through Windows Task Scheduler (once, daily, days of the week, at sign-in, every N minutes), also when
   Shelly is closed; per user, no administrator rights.
@@ -60,8 +60,8 @@ Details: [English guide](docs/USER_GUIDE.md) · [Русский](docs/USER_GUIDE
 
 ## Python scripts
 
-Since 1.1.0 Shelly lists and runs `.py` files too, in `Scripts` and in the added folders. A Python script row carries the
-**PY** mark and a code icon.
+Since 1.1.0 Shelly lists and runs `.py` files too, in `Scripts` and in the added folders. A Python script row shows its
+`.py` extension and a code icon.
 
 - **Interpreter.** Settings → Environment, pick *Python* in the *Runtime* list. One line shows what is used, for example
   `Python 3.12 · auto-detect` or `Python 3.13 · custom path` (the full path is in its tooltip). *Choose…* sets your own
@@ -90,7 +90,7 @@ Since 1.1.0 Shelly lists and runs `.py` files too, in `Scripts` and in the added
 
 ## Batch files and custom interpreters
 
-Since 1.3.0 `.bat` and `.cmd` files are listed and run with `cmd.exe` (nothing to set up; mark **BAT**/**CMD**). One
+Since 1.3.0 `.bat` and `.cmd` files are listed and run with `cmd.exe` (nothing to set up). One
 *Arguments* box, presets, schedules, history and favorites work as for Python. Non-English output works inline: UTF-8
 files get `chcp 65001`, and each output line is read as UTF-8 or else in the OEM code page. In the output panel `pause`
 returns at once (no keyboard input there); run such files in a window. Batch files get a basic check of known dangerous
@@ -102,9 +102,9 @@ dangerous commands.
 
 ## Scripts with their own files (Import folder)
 
-*Import folder…* (the `>` commands, the menu of the Scripts group) or a folder dropped on the Scripts page copies the
-whole folder into `Scripts`, so a script keeps its configs, data and modules next to it. A small dialog asks for the
-folder name (the source name by default; a name already in `Scripts` is refused) and lists the script files
+*Import folder…* (the `>` commands, the menu of the Scripts group) copies a whole folder into `Scripts`, so a script keeps
+its configs, data and modules next to it. (Dropping a folder onto the Shelly window connects it directly as an external
+folder.) A small dialog asks for the folder name (the source name by default; a name already in `Scripts` is refused) and lists the script files
 found, all ticked: unticked ones are copied but not shown. It also shows how many files and how much will be copied.
 
 - Not copied: Python environments (`.venv`, `venv`, `env` with `pyvenv.cfg`), `__pycache__`, `.git`, `node_modules`.
@@ -146,7 +146,7 @@ and Windows PowerShell 5.1 or PowerShell 7.
 
 Everything goes to `artifacts\`: `publish\fd` and `publish\sc` (single-file `Shelly.exe`), `dist\` (the release
 zips and `SHA256SUMS.txt`), `test-results\`. `build.bat` still works and calls `build.ps1`. The version is
-`VersionPrefix` in `Directory.Build.props`; a local build is `1.4.1-dev`.
+`VersionPrefix` in `Directory.Build.props`; a local build is `1.5.0-dev`.
 
 Release: set `VersionPrefix` and a `CHANGELOG.md` section, merge to `main`, push the tag `v<version>`. The Release
 workflow tests and packs the tag and publishes both zips with the CHANGELOG section as the notes. Details (Russian):

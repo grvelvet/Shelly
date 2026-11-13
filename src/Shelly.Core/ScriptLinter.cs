@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Shelly.Core;
 
-/// <summary>A single lint issue reported by <see cref="ScriptLinter"/> (1.4.0).</summary>
+/// <summary>A single lint issue reported by <see cref="ScriptLinter"/>.</summary>
 public sealed record LintIssue(
     int Line,
     int Column,
@@ -17,7 +17,7 @@ public sealed record LintIssue(
     public int SeverityRank => Severity switch { "error" => 0, "warning" => 1, _ => 2 };
 }
 
-/// <summary>Fast static linter for PowerShell (.ps1), Python (.py), Batch (.bat/.cmd), and custom scripts (1.4.0).</summary>
+/// <summary>Fast static linter for PowerShell (.ps1), Python (.py), Batch (.bat/.cmd), and custom scripts.</summary>
 public static class ScriptLinter
 {
     public static List<LintIssue> Lint(string path, string text, ScriptMeta? meta = null, bool hasBom = false)

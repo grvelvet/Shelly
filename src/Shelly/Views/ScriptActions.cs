@@ -351,7 +351,7 @@ public static class ScriptActions
         App.Status(Loc.F("folderRecycled", folderName));
     }
 
-    /// <summary>Fire and forget from a menu: an exception is logged and shown (1.3.1).</summary>
+    /// <summary>Fire and forget from a menu: an exception is logged and shown.</summary>
     public static void Build(ScriptFile f) => App.Fire(() => BuildAsync(f), "build");
 
     static async Task BuildAsync(ScriptFile f)
@@ -507,7 +507,7 @@ public static class ScriptActions
         bool running = St.Runs.IsRunning(f.Rel);
         if (running) m.Items.Add(Item(Loc.T("stop"), Glyphs.Stop, () => Stop(f)));
         m.Items.Add(Item(Loc.T("ctxRun"), Glyphs.Play, () => Run(f), "Enter", true));
-        // The other of the two everyday modes (1.2.0: a plain Run is a separate window unless the script or Settings say otherwise)
+        // Offer the alternate run mode (inline vs separate window)
         if (EffectiveMode(f) == "window") m.Items.Add(Item(Loc.T("ctxRunInline"), Glyphs.Play, () => Run(f, "inline")));
         else m.Items.Add(Item(Loc.T("ctxRunWindow"), Glyphs.Window, () => Run(f, "window")));
         m.Items.Add(Item(Loc.T("ctxRunAdmin"), Glyphs.Shield, () => Run(f, "admin")));

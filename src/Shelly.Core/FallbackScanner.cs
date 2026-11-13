@@ -177,7 +177,7 @@ public static class FallbackScanner
         return Safety.Sorted(found.Where(f => !((f.Rule is "Dynamic" or "Download") && dl.Contains(f.Line))));
     }
 
-    /// <summary>The native-command rules for commands already split into words (batch files, 1.3.0): the same rules and
+    /// <summary>The native-command rules for commands already split into words (batch files): the same rules and
     /// severities as a PowerShell script's native commands, plus files a download command saves and a later line runs.</summary>
     public static List<DangerFinding> ScanCommands(IEnumerable<(int Line, List<string> Words)> commands, string[] srcLines)
     {

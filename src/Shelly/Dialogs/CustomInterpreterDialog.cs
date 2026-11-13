@@ -5,7 +5,7 @@ using Shelly.Services;
 
 namespace Shelly.Dialogs;
 
-/// <summary>Settings > Environment > Custom interpreters > Add / Edit (1.3.0): name, extensions, program (Browse…),
+/// <summary>Settings > Environment > Custom interpreters > Add / Edit: name, extensions, program (Browse…),
 /// arguments with {script} / {args} / {dir}, and the working folder. Checked with CustomInterpreters.Validate before it is
 /// saved: built-in extensions (.ps1 .py .bat .cmd .exe…) are refused, the program must exist.</summary>
 public sealed class CustomInterpreterDialog : DialogWindow

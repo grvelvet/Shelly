@@ -2,12 +2,12 @@ using System.Text;
 
 namespace Shelly.Core;
 
-/// <summary>How a run was asked for (moved to Shelly.Core in 1.3.1, with the planner).</summary>
+/// <summary>Options describing how a run was requested.</summary>
 public sealed class RunOptions
 {
-    /// <summary>inline | window | admin; null = the remembered mode or header, else the default mode of Settings (RunModes.Resolve).</summary>
+    /// <summary>inline | window | admin | gui | hidden; null = the remembered mode or header, else the default mode of Settings (RunModes.Resolve).</summary>
     public string? Mode;
-    /// <summary>Run with this parameter preset (1.2.0): its values instead of the remembered ones.</summary>
+    /// <summary>Run with this parameter preset: its values instead of the remembered ones.</summary>
     public string? Preset;
     /// <summary>Parameter values from the Run settings dialog.</summary>
     public IDictionary<string, object>? Values;
@@ -102,7 +102,7 @@ public sealed class RunPlan
     public required string InlineArgs { get; init; }
     /// <summary>The window command line for an end marker file.</summary>
     public required Func<string, string> WindowArgs { get; init; }
-    /// <summary>The window command line for an end marker file and optional transcript log file (1.4.0).</summary>
+    /// <summary>The window command line for an end marker file and optional transcript log file.</summary>
     public Func<string, string?, string>? WindowArgsWithLog { get; init; }
     public string GetWindowArgs(string doneFile, string? logFile = null) =>
         logFile != null && WindowArgsWithLog != null ? WindowArgsWithLog(doneFile, logFile) : WindowArgs(doneFile);
@@ -135,15 +135,15 @@ public sealed record PlanResult(PlanStatus Status, RunPlan? Plan, string? Block,
     public string Reason => Loc.F(Block ?? "schedBlockConfirm", Name, Arg);
 }
 
-/// <summary>Every check between "run this script" and the process start (1.3.1; before, RunManager and Unattended each had
-/// their own copy). Interactive runs ask through IRunPrompts; scheduled runs ask nothing and are skipped wherever an
-/// interactive run would ask (administrator rights, Mark of the Web, findings not trusted for this exact content, an
-/// unverified script, missing parameters). Both end with the hash check: what was checked is what starts.</summary>
+/// <summary>Every check between "run this script" and the process start. Interactive runs ask through IRunPrompts; scheduled
+/// runs ask nothing and are skipped wherever an interactive run would ask (administrator rights, Mark of the Web, findings
+/// not trusted for this exact content, an unverified script, missing parameters). Both end with the hash check: what was
+/// checked is what starts.</summary>
 public static class RunPlanner
 {
-    /// <summary>How long a run waits for PowerShell's analysis of a script that is not analyzed yet (1.3.1: 60 s everywhere;
-    /// interactive runs and builds waited 30 s, scheduled runs 60 s). A timeout means "unverified": one more question for
-    /// an interactive run, a skipped scheduled run. A cold PowerShell 7 start on a slow machine can take longer than 30 s.</summary>
+    /// <summary>How long a run waits for PowerShell's analysis of a script that is not analyzed yet. A timeout means
+    /// "unverified": one more question for an interactive run, a skipped scheduled run. A cold PowerShell 7 start on a
+    /// slow machine can take longer than 30 s.</summary>
     public static readonly TimeSpan AnalysisWait = TimeSpan.FromSeconds(60);
 
     /// <summary>The checked content: the file's hash read now (not the one from the last scan).</summary>
@@ -179,7 +179,7 @@ public static class RunPlanner
     // ---------- Interactive ----------
 
     /// <summary>An interactive run of f (already the fresh entry of the list). o may be changed (preset values, the mode of
-    /// the Run settings dialog), as before 1.3.1: a re-check after a Changed result starts from it.</summary>
+    /// the Run settings dialog): a re-check after a Changed result starts from it.</summary>
     public static async Task<PlanResult> PlanInteractiveAsync(IRunEnvironment env, IRunPrompts ui, ScriptFile f, RunOptions o)
     {
         f = Rehash(env, f);

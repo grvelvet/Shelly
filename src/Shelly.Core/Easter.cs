@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Shelly.Core;
 
-/// <summary>1.1.2: the small secret in About. Three clicks within <see cref="Window"/> open it; the caption is picked at
+/// <summary>Easter egg in About. Three clicks within <see cref="Window"/> open it; the caption is picked at
 /// random from <see cref="CaptionKeys"/> (never the same one twice in a row).</summary>
 public sealed class TripleClick
 {

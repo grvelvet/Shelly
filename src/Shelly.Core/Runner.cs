@@ -74,7 +74,7 @@ public sealed class InlineRunner : IDisposable
     /// <summary>When the process has exited but a stream is still open (a child process inherited it), the run ends after this
     /// time. A normal run does not wait: it ends as soon as both streams reach their end.</summary>
     public TimeSpan StreamGrace = TimeSpan.FromSeconds(3);
-    /// <summary>Set for programs whose output can come in different code pages (batch files, custom interpreters, 1.3.0):
+    /// <summary>Set for programs whose output can come in different code pages (batch files, custom interpreters):
     /// each line is read as UTF-8 when it is valid UTF-8, else in this code page (the console's OEM one). Null: UTF-8.</summary>
     public Encoding? MixedFallback;
 

@@ -13,7 +13,7 @@ public sealed record ExternalEditorCommand(
     string Arguments,
     bool UsedIseFallback = false);
 
-/// <summary>External editor detection and command-line resolution (1.4.0).</summary>
+/// <summary>External editor detection and command-line resolution.</summary>
 public static class ExternalEditors
 {
     public static readonly string[] DefaultChoices = { "builtin", "external" };

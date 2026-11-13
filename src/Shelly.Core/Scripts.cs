@@ -19,9 +19,9 @@ public sealed class ScriptFile
     /// <summary>The language (<see cref="ScriptLangs"/>): ps, py, bat or custom.</summary>
     public string Lang => ScriptKinds.Lang(Path.Length > 0 ? Path : Rel);
     public bool IsPowerShell => Lang == ScriptLangs.PowerShell;
-    /// <summary>A batch file (.bat / .cmd, 1.3.0): run by cmd.exe.</summary>
+    /// <summary>A batch file (.bat / .cmd): run by cmd.exe.</summary>
     public bool IsBatch => Lang == ScriptLangs.Batch;
-    /// <summary>A script of a custom interpreter (1.3.0).</summary>
+    /// <summary>A script of a custom interpreter.</summary>
     public bool IsCustom => Lang == ScriptLangs.Custom;
     /// <summary>The script takes a free arguments line (everything but PowerShell): no parameter form, no PowerShell analysis,
     /// no .exe build, no administrator run of its own.</summary>

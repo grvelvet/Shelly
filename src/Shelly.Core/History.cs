@@ -18,9 +18,9 @@ public sealed class RunEntry : INotifyPropertyChanged
     public string Args { get; set; } = "";
     /// <summary>inline | window | admin</summary>
     public string Mode { get; set; } = "inline";
-    /// <summary>list | tray | editor | rerun | jumplist | schedule (1.2.0)</summary>
+    /// <summary>list | tray | editor | rerun | jumplist | schedule</summary>
     public string Origin { get; set; } = "list";
-    /// <summary>The parameter preset the run used (1.2.0), "" for none.</summary>
+    /// <summary>The parameter preset the run used, "" for none.</summary>
     public string Preset { get; set; } = "";
     public DateTime Start { get; set; }
     long ms;
@@ -107,7 +107,7 @@ public sealed class HistoryStore
             return null;
         var e = new RunEntry { Id = id, Rel = S("rel"), Name = S("name") };
         if (e.Name.Length == 0) e.Name = Path.GetFileNameWithoutExtension(e.Rel.Replace('\\', '/'));
-        // 1.3.0: Python, batch and custom runs keep their engine on reload (before, a "py" entry came back as 5.1)
+        // Python, batch and custom runs keep their engine on reload
         e.Engine = S("engine") is "7" or EngineInfo.Python or EngineInfo.Batch or EngineInfo.Custom ? S("engine") : "5.1";
         e.Args = S("args");
         e.Mode = Modes.Contains(S("mode")) ? S("mode") : "inline";
@@ -191,7 +191,7 @@ public sealed class HistoryStore
         catch { return null; }
     }
 
-    /// <summary>Adds the finished runs another Shelly process wrote to the file meanwhile (1.2.0: a scheduled run while this
+    /// <summary>Adds the finished runs another Shelly process wrote to the file meanwhile (e.g. a scheduled run while this
     /// one was open, or this one is the scheduled run): new ids only, never runs removed here. Returns how many.</summary>
     public int MergeFromDisk()
     {

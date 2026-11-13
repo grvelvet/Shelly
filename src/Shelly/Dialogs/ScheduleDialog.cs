@@ -6,7 +6,7 @@ using Shelly.Services;
 
 namespace Shelly.Dialogs;
 
-/// <summary>"Schedule…" (1.2.0): when (once, daily, days of the week, at Windows sign-in, every N minutes), which preset,
+/// <summary>"Schedule…": when (once, daily, days of the week, at Windows sign-in, every N minutes), which preset,
 /// hidden or in a window, on/off. Saved to the settings first (the source of truth), then to Task Scheduler. Scripts that
 /// run as administrator can't be scheduled; findings and Mark of the Web are shown, because a scheduled run that would
 /// have to ask is skipped.</summary>

@@ -47,7 +47,7 @@ public static class ShellOps
     public static void RecycleFolder(string path) =>
         FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.ThrowException);
 
-    /// <summary>Open a script in the configured or auto-detected external editor (1.4.0).</summary>
+    /// <summary>Open a script in the configured or auto-detected external editor.</summary>
     public static void ExternalEditor(string path, int line = 0)
     {
         try

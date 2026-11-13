@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Shelly.Core;
 
-/// <summary>"Import folder…" (1.1.1): a script together with its own files is copied as a whole folder into Scripts. The copy
+/// <summary>"Import folder…": a script together with its own files is copied as a whole folder into Scripts. The copy
 /// goes to a hidden temporary folder next to the target and is renamed into place at the end, so a failure or a cancel never
 /// leaves half a folder. Python environments, __pycache__, .git and node_modules are left out; links and junctions are not
 /// followed. The folder gets a small manifest (<see cref="ManifestName"/>) that marks it as imported and lists the scripts the

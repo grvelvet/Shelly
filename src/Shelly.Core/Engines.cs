@@ -23,9 +23,9 @@ public sealed class EngineInfo
 
     /// <summary>The engine value of a Python script (history entries and the meta of .py files).</summary>
     public const string Python = "py";
-    /// <summary>The engine value of a batch file (cmd.exe, 1.3.0).</summary>
+    /// <summary>The engine value of a batch file (cmd.exe).</summary>
     public const string Batch = "bat";
-    /// <summary>The engine value of a custom interpreter's script (1.3.0).</summary>
+    /// <summary>The engine value of a custom interpreter's script.</summary>
     public const string Custom = "x";
 
     public static string Name(string engine) => engine switch
@@ -95,7 +95,7 @@ public static class EngineResolver
 }
 
 /// <summary>A problem shown before a run and in the details: Kind = parse | need7 | nengine | core | syntax7 | winps | desktop | admin | module
-/// | batBom | customMissing (1.3.0);
+/// | batBom | customMissing;
 /// Level = error | warn | info.</summary>
 public sealed class ScriptIssue
 {

@@ -12,7 +12,7 @@ namespace Shelly.Dialogs;
 /// line; warnings when there are any; Remember + Run / Cancel in the button band.</summary>
 public sealed class RunSettingsWindow : DialogWindow
 {
-    /// <summary>Preset: the parameter preset the values are exactly from (1.2.0; null = none or changed in the form).</summary>
+    /// <summary>Preset: the parameter preset the values are exactly from (null = none or changed in the form).</summary>
     public sealed record Answer(string Mode, Dictionary<string, object> Values, string? Preset = null);
 
     public const double DialogWidth = 520;   // WinUI ContentDialog: 320..548
@@ -23,7 +23,7 @@ public sealed class RunSettingsWindow : DialogWindow
     ScriptMeta meta;
     readonly Grid paramGrid = new() { Margin = new Thickness(0, 0, 0, 16) };
     readonly StackPanel warnPanel = new();
-    /// <summary>1.1.2: the engine, mode and parameter boxes share the dialog width (about 230 px each for engine and
+    /// <summary>The engine, mode and parameter boxes share the dialog width (about 230 px each for engine and
     /// mode), and some Russian texts are longer ("Интерпретатор: .venv · Python 3.12"). The selected text ends with an
     /// ellipsis instead of being cut off; the open list and the tooltip show it in full.</summary>
     static readonly DataTemplate TrimTemplate = MakeTrimTemplate();
@@ -81,7 +81,7 @@ public sealed class RunSettingsWindow : DialogWindow
         foreach (var (tag, key) in new[] { ("inline", "rsModeNormal"), ("window", "rsModeWindow"), ("admin", "rsModeAdmin") })
             modeBox.Items.Add(Item(Loc.F("rsModeLabel", Loc.T(key)), tag));
         modeBox.ToolTip = Loc.T("rsModeTip");
-        // The remembered mode, else the script's own line, else the default of Settings (1.2.0: a separate window)
+        // The remembered mode, else the script's own line, else the default of Settings
         string mode = preset?.Mode ?? ScriptHeader.ModeOf(f) ?? st.Settings.DefaultMode;
         modeBox.SelectedIndex = mode == "admin" ? 2 : mode == "window" ? 1 : 0;
 
@@ -122,7 +122,7 @@ public sealed class RunSettingsWindow : DialogWindow
         FillPresets(null);
     }
 
-    // ---------- Parameter presets (1.2.0) ----------
+    // ---------- Parameter presets ----------
 
     /// <summary>Preset [combo] [Save as…] [Delete]: named sets of the values below. The row is there for scripts with
     /// parameters (Python: the arguments line).</summary>

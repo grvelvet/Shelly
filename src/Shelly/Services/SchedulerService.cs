@@ -6,7 +6,7 @@ using Shelly.Core;
 
 namespace Shelly.Services;
 
-/// <summary>Schedules → Windows Task Scheduler (1.2.0), through schtasks.exe and a task XML file: no extra package, no COM
+/// <summary>Schedules → Windows Task Scheduler, through schtasks.exe and a task XML file: no extra package, no COM
 /// interop assembly, nothing that needs administrator rights. Every task is in the \Shelly\ folder, runs as the current
 /// user only while signed in (InteractiveToken, least privilege) and starts "Shelly.exe --scheduled &lt;id&gt;"; what the id
 /// means (script, preset, how to run) is read from the settings, which stay the source of truth. The tasks are checked
@@ -71,7 +71,7 @@ public sealed class SchedulerService
     }
 
     /// <summary>Creates or replaces the task of a schedule. null = done, else schtasks' error. Runs in the background:
-    /// it does not touch <see cref="Last"/>, which is read and changed on the calling (UI) thread only (1.3.1).</summary>
+    /// it does not touch <see cref="Last"/>, which is read and changed on the calling (UI) thread only.</summary>
     static string? Apply(Schedule s, string instance, string exePath)
     {
         string name = SchTasks.TaskName(instance, s.Id);

@@ -4,9 +4,9 @@ using WinForms = System.Windows.Forms;
 
 namespace Shelly.Services;
 
-/// <summary>Unattended runs (1.2.0). Nobody can answer a dialog, so anything that would ask (administrator rights, Mark of
+/// <summary>Unattended runs. Nobody can answer a dialog, so anything that would ask (administrator rights, Mark of
 /// the Web, findings that are not trusted for this exact content, an unverified script, missing parameters) skips the run
-/// instead: a failed history entry and a notification say why. The checks are RunPlanner.PlanScheduledAsync (1.3.1).
+/// instead: a failed history entry and a notification say why. The checks are in RunPlanner.PlanScheduledAsync.
 /// Used by the running Shelly and by a Shelly started by Task Scheduler while none was running (headless).</summary>
 public static class Unattended
 {

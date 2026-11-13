@@ -16,7 +16,7 @@ public sealed class ScriptMeta
     /// <summary>The safety scan: "ok" (PowerShell's parser checked the script), "checking" (it has not reported yet;
     /// Danger holds the built-in scanner's preliminary findings), "unverified" (no PowerShell could check it) or "none"
     /// (a Python script: the PowerShell scan does not apply), "basic" (a batch file: the light built-in check of its
-    /// commands, 1.3.0) or "custom" (a custom interpreter's script: not checked). Only "ok" can be shown as "nothing found".</summary>
+    /// commands) or "custom" (a custom interpreter's script: not checked). Only "ok" can be shown as "nothing found".</summary>
     public string Scan = "ok";
     public bool Verified => Scan == "ok";
     /// <summary>Mark of the Web of the file (downloaded from the internet), or null.</summary>
@@ -26,7 +26,7 @@ public sealed class ScriptMeta
     internal bool IsPython => Engine.Engine == EngineInfo.Python;
 }
 
-/// <summary>The note a dialog shows about the safety check of a script (<see cref="ScriptMeta.Scan"/>, 1.3.0).</summary>
+/// <summary>The note a dialog shows about the safety check of a script (<see cref="ScriptMeta.Scan"/>).</summary>
 public static class ScanNotes
 {
     /// <summary>The Loc key, or null for "ok" (<paramref name="clean"/>: the key to use for "ok", when there is one).</summary>
@@ -283,7 +283,7 @@ public sealed class AnalysisService : IDisposable
         };
     }
 
-    /// <summary>A batch file or a custom interpreter's script (1.3.0): the description from its first comment, for a batch
+    /// <summary>A batch file or a custom interpreter's script: the description from its first comment, for a batch
     /// file the findings of <see cref="BatchScanner"/> (Scan "basic"; cached by path + hash), for a custom one nothing
     /// (Scan "custom"); issues: a UTF-8 BOM in a batch file, a custom program that is not there.</summary>
     ScriptMeta OtherMeta(ScriptFile f, Settings s)
