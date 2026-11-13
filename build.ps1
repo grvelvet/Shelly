@@ -52,7 +52,7 @@ $AppProject = Join-Path $Root 'src/Shelly/Shelly.csproj'
 $Rid = 'win-x64'
 # The files next to Shelly.exe in a release zip (folder Shelly/), in this order. build/.keep is written empty.
 # Paths use / (Windows takes it too; the script also runs in PowerShell 7 on Linux and macOS).
-$Layout = @('assets/shelly.ico', 'build/.keep', 'docs/USER_GUIDE.md', 'docs/USER_GUIDE_RU.md', 'docs/FEATURES_RU.md',
+$Layout = @('assets/shelly.ico', 'build/.keep', 'docs/USER_GUIDE.md', 'docs/USER_GUIDE_RU.md',
     'README.md', 'CHANGELOG.md', 'LICENSE')
 
 function Step([string] $text) { Write-Host ''; Write-Host "==> $text" -ForegroundColor Cyan }

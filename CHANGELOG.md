@@ -8,6 +8,10 @@ Versions 0.9.x were the PowerShell + WPF edition; 1.0.0 and later are the .NET e
 
 ## [Unreleased]
 
+### Changed
+
+- **Documentation consolidation (`README.md`, `SECURITY.md`, `docs/USER_GUIDE.md`, `docs/USER_GUIDE_RU.md`, `build.ps1`):** deduplicated and streamlined the user guides into 10 sections, integrated the language capability matrix, updated all sections for 1.4.0/1.5.0 features, and removed the redundant `docs/FEATURES_RU.md`.
+
 ## [1.5.0] - 2026-11-06
 
 ### Changed
@@ -132,8 +136,6 @@ Versions 0.9.x were the PowerShell + WPF edition; 1.0.0 and later are the .NET e
 ### Changed
 
 - Build system (`build.ps1`, `Directory.Build.props`, `Directory.Packages.props`, `global.json`) with output in `artifacts/`.
-- In the secret About window (triple-click on the logo), removed the bottom *Close* button, leaving only the title-bar `✕`
-  button and the *Buy me a coffee ☕* link.
 
 ### Removed
 
@@ -249,7 +251,6 @@ Maintenance release: technical debt and dead code. Running scripts works as in 1
   page steps the size. Saved as `favoritesSize` (an unknown value means Medium).
 - **Support the project.** Settings > About has a *Support the project ☕* link (Boosty) next to the GitHub link; also in
   the README and `.github/FUNDING.yml`. No pop-ups or reminders.
-- About hides a small secret.
 
 ### Changed
 

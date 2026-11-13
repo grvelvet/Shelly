@@ -45,7 +45,7 @@
 | `artifacts\release-notes.md` | раздел CHANGELOG этой версии (текст релиза) |
 
 В zip папка `Shelly\`: `Shelly.exe`, `Scripts\` (только файлы под git, если папка есть), `assets\shelly.ico`,
-пустая `build\`, `docs\USER_GUIDE.md`, `docs\USER_GUIDE_RU.md`, `docs\FEATURES_RU.md`, `README.md`, `CHANGELOG.md`,
+пустая `build\`, `docs\USER_GUIDE.md`, `docs\USER_GUIDE_RU.md`, `README.md`, `CHANGELOG.md`,
 `LICENSE`. Время файлов в zip — время коммита: один коммит даёт одинаковый zip.
 
 ## Версия
